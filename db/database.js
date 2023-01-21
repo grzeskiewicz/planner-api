@@ -1,4 +1,4 @@
-const mysql = require('mysql');
+const mysql = require('mysql2');
 const moment=require('moment');
 const dbConfig = require('./dbConfig');
 const { body, validationResult } = require('express-validator');
