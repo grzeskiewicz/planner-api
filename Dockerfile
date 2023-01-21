@@ -6,5 +6,6 @@ COPY package-lock.json ./
 COPY ./ ./
 RUN npm i
 RUN mkdir -p node_modules/.cache && chmod -R 777 node_modules/.cache
+RUN chown -R node:node /app/node_modules
 CMD ["npm", "run", "start"]
 EXPOSE 3001
