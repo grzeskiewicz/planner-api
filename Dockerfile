@@ -5,6 +5,6 @@ COPY package.json ./
 COPY package-lock.json ./
 COPY ./ ./
 RUN npm i
-RUN  chown -R node:node node_modules
+RUN  chown -R node:node app/node_modules
 CMD ["npm", "run", "start"]
 EXPOSE 3001
