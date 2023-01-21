@@ -28,12 +28,31 @@ app.post('/addmicrogreens', [
     body('color').isString().withMessage("Not a string!").isLength({max:10}).withMessage("Too long value!"),
 
 ],db.addMicrogreens);
+
+app.post('/editmicrogreens',db.editMicrogreens);
+
+/* [
+    body('name_en').isString().withMessage("Not a string!").isLength({max:60}).withMessage("Too long value!"),
+    body('name_pl,').isString().withMessage("Not a string!").isLength({max:60}).withMessage("Too long value!"),
+    body('grams_tray').isInt().withMessage("Not integer!"),
+    body('top_water').isInt({max:1000}).withMessage("Not integer or too high value!"),
+    body('bottom_water').isInt({max:1000}).withMessage("Not integer or too high value!"),
+    body('weight').isInt({max:15}).withMessage("Not integer or too high value!"),
+    body('blackout').isInt({max:15}).withMessage("Not integer or too high value!"),
+    body('light').isInt({max:15}).withMessage("Not integer or too high value!"),
+    body('color').isString().withMessage("Not a string!").isLength({max:10}).withMessage("Too long value!"),
+
+]*/
+
 app.post('/addcrops',[
     body('microgreenID').isInt().withMessage("Not integer!"),
     body('shelfID').isInt().withMessage("Not integer!"),
     body('trays').isInt().withMessage("Not integer!"),
     body('notes').isString().withMessage("Not string!").isLength({max:500}),
 ], db.addCrops);
+
+
+
 
 app.post('/deletecrop',[
     body('crop_id').isInt().withMessage("Not integer!"),
