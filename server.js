@@ -75,7 +75,7 @@ app.get('/shelves', db.getShelves);
 const port = process.env.PORT || 3001,
     ip = process.env.IP || '127.0.0.1';
 
-http.listen(port);
-console.log('Server running on http://%s:%s', ip,port);
-
+//http.listen(port);
+//console.log('Server running on http://%s:%s', ip,port);
+console.log('NODEJS RUNNING')
 module.exports = app;

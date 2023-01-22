@@ -34,12 +34,12 @@ services:
   api:
     build:
       dockerfile: Dockerfile
-      context: "./server"
+      context: "./planner-api"
     depends_on:
       - mysql_db
     volumes:
       - /app/node_modules
-      - ./server:/app
+      - ./planner-api:/app
     environment:
       <<: *common-variables
       MYSQL_HOST_IP: mysql_db
@@ -50,10 +50,10 @@ services:
       - CHOKIDAR_USEPOLLING=true
     build:
       dockerfile: Dockerfile
-      context: ./client
+      context: ./planner
     volumes:
       - /app/node_modules
-      - ./client:/app
+      - ./planner:/app
 
   adminer:
       image: adminer:latest
