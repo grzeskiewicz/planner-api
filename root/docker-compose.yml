@@ -18,7 +18,7 @@ services:
     environment:
       <<: *common-variables
       MYSQL_ROOT_PASSWORD: MYSQL_ROOT_PASSWORD
-      MYSQL_HOST: localhost
+      MYSQL_HOST: mysql_db
 
   nginx:
     depends_on:
@@ -34,12 +34,12 @@ services:
   api:
     build:
       dockerfile: Dockerfile
-      context: "./planner-api"
+      context: "./server"
     depends_on:
       - mysql_db
     volumes:
-      - /planner-api/node_modules
-      - ./planner-api:/app
+      - /app/node_modules
+      - ./server:/app
     environment:
       <<: *common-variables
       MYSQL_HOST_IP: mysql_db
@@ -50,10 +50,10 @@ services:
       - CHOKIDAR_USEPOLLING=true
     build:
       dockerfile: Dockerfile
-      context: ./planner
+      context: ./client
     volumes:
-      - /planner/node_modules
-      - ./planner:/app
+      - /app/node_modules
+      - ./client:/app
 
   adminer:
       image: adminer:latest
