@@ -38,7 +38,7 @@ services:
     depends_on:
       - mysql_db
     volumes:
-      - /app/node_modules
+      - /planner-api/node_modules
       - ./planner-api:/app
     environment:
       <<: *common-variables
@@ -52,7 +52,7 @@ services:
       dockerfile: Dockerfile
       context: ./planner
     volumes:
-      - /app/node_modules
+      - /planner/node_modules
       - ./planner:/app
 
   adminer:
