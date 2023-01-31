@@ -84,6 +84,8 @@ const deleteCrop = function (req, res, next) {
       return res.status(400).json({ errors: errors.array() });
       return;
     }
+
+    console.log(req.body);
         connection.query(`DELETE FROM CROPS WHERE id=${req.body.crop_id}`, function (err, rows) {
             if (err) {res.json({success:false,err:err}); return;}
             res.json({ success: true, msg: 'CROP_DELETED' });
@@ -137,12 +139,13 @@ console.log(vals);
     const sameShelfCrops=rowsx;
     let isTaken=false;
 
-
+console.log(sameShelfCrops);
     for (const crop of sameShelfCrops){
        //crop.harvest and cropLightStart vs lightStartDate and req.body.harvest
        const cropMicrogreen=microgreensData.find(x=> x.id==crop.microgreen_id);
        const cropHarvest=moment(crop.harvest);
        const cropLightStart=moment(crop.harvest).subtract(cropMicrogreen.light, "days");
+       console.log(lightStartDate,cropHarvest,harvestDate,cropLightStart)
 if((lightStartDate.isSameOrAfter(cropHarvest) || harvestDate.isSameOrBefore(cropLightStart))===false) {
     res.json({ success: false, msg: 'CROP_DATE_TAKEN' });
     isTaken=true;
