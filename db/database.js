@@ -84,7 +84,7 @@ const deleteCrop = function (req, res, next) {
       return res.status(400).json({ errors: errors.array() });
       return;
     }
-        connection.query(`DELETE FROM CROPS WHERE id='${req.body.crop_id}'`, function (err, rows) {
+        connection.query(`DELETE FROM crops WHERE id='${req.body.crop_id}'`, function (err, rows) {
             if (err) {res.json({success:false,err:err}); return;}
             res.json({ success: true, msg: 'CROP_DELETED' });
         });   
