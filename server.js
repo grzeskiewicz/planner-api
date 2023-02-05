@@ -31,6 +31,8 @@ app.post('/addmicrogreens', [
 
 app.post('/editmicrogreens',db.editMicrogreens);
 app.post('/schedulewatering',db.scheduleWatering);
+app.post('/schedulewatering',db.completeWatering);
+
 
 
 /* [

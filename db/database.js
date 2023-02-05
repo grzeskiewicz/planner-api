@@ -222,4 +222,13 @@ const scheduleWatering= function (req, res) {
 }
 
 
-module.exports = {getCrops, getMicrogreens,getShelves, addMicrogreens, addRacks, addCrops,editCrop,deleteCrop,editMicrogreens,saveNotes,scheduleWatering };
+const completeWatering= function (req, res) {
+    const crop = req.body.crop;
+    connection.query(`UPDATE crops SET completed='1' WHERE id='${crop}'`, function (err, result) {
+        if (err) {res.json({ success: false, msg: err }); return;}
+        res.json({ succes: true, msg: "CROP_COMPLETED" });
+    });
+}
+
+
+module.exports = {getCrops, getMicrogreens,getShelves, addMicrogreens, addRacks, addCrops,editCrop,deleteCrop,editMicrogreens,saveNotes,scheduleWatering,completeWatering };
