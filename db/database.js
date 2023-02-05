@@ -133,7 +133,8 @@ const addCrops = function (req, res, next) { // TODO2: pobieranie rekordow o tym
         vals=`('${moment(harvestDate).format('YYYY-MM-DD')}',${microgreenID},${shelfID},${trays},${notes})`;
 console.log('HARVEST DATE');
 console.log(harvestDate);
-console.log('light',microgreen.light)
+console.log('light',microgreen.light);
+console.log("microgreenid", req.body.microgreenID);
         lightStartDate=harvestDate.subtract(microgreen.light, "days");
         connection.query(`SELECT * FROM crops WHERE shelf_id=${shelfID}`, function (err, rowsx) {
     const sameShelfCrops=rowsx;
@@ -146,7 +147,7 @@ console.log(sameShelfCrops);
        const cropHarvest=moment(crop.harvest);
        const cropLightStart=moment(crop.harvest).subtract(cropMicrogreen.light, "days");
 
-       console.log(lightStartDate,cropHarvest,harvestDate,cropLightStart)
+      // console.log(lightStartDate,cropHarvest,harvestDate,cropLightStart)
 if((lightStartDate.isSameOrAfter(cropHarvest) || harvestDate.isSameOrBefore(cropLightStart))===false) {
     res.json({ success: false, msg: 'CROP_DATE_TAKEN' });
     isTaken=true;
