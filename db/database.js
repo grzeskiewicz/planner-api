@@ -136,6 +136,7 @@ console.log(harvestDate);
 console.log('light',microgreen.light);
 console.log("microgreenid", req.body.microgreenID);
         lightStartDate=harvestDate.subtract(microgreen.light, "days");
+        console.log(lightStartDate);
         connection.query(`SELECT * FROM crops WHERE shelf_id=${shelfID}`, function (err, rowsx) {
     const sameShelfCrops=rowsx;
     let isTaken=false;
