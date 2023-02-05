@@ -30,6 +30,8 @@ app.post('/addmicrogreens', [
 ],db.addMicrogreens);
 
 app.post('/editmicrogreens',db.editMicrogreens);
+app.post('/schedulewatering',db.scheduleWatering);
+
 
 /* [
     body('name_en').isString().withMessage("Not a string!").isLength({max:60}).withMessage("Too long value!"),

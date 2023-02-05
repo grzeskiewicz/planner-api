@@ -208,5 +208,13 @@ const editCrop= function (req, res) {
     });
 }
 
+const scheduleWatering= function (req, res) {
+    const crop = req.body.crop;
+    connection.query(`UPDATE crops SET scheduled='true', WHERE id='${crop}'`, function (err, result) {
+        if (err) {res.json({ success: false, msg: err }); return;}
+        res.json({ succes: true, msg: "CROP_EDITED" });
+    });
+}
 
-module.exports = {getCrops, getMicrogreens,getShelves, addMicrogreens, addRacks, addCrops,editCrop,deleteCrop,editMicrogreens,saveNotes };
+
+module.exports = {getCrops, getMicrogreens,getShelves, addMicrogreens, addRacks, addCrops,editCrop,deleteCrop,editMicrogreens,saveNotes,scheduleWatering };
