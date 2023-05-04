@@ -6,6 +6,8 @@ const http = require('http').Server(app);
 const bodyParser = require('body-parser');
 const db = require('./db/database');
 const { body, validationResult } = require('express-validator');
+const exec = require('child_process').exec;
+
 
 
 app.use(cors());
@@ -33,6 +35,15 @@ app.post('/editmicrogreens',db.editMicrogreens);
 app.post('/schedulewatering',db.scheduleWatering);
 app.post('/completewatering',db.completeWatering);
 
+app.post('/pingcheck',ping);
+
+const ping= function (req, res) {
+const ip=req.body.ip;
+exec("ping -c 3 "+ip, function (err, stdout, stderr) {
+    console.log(stdout);
+    res.json({msg:stdout});
+});
+}
 
 
 /* [
