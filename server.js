@@ -35,15 +35,17 @@ app.post('/editmicrogreens',db.editMicrogreens);
 app.post('/schedulewatering',db.scheduleWatering);
 app.post('/completewatering',db.completeWatering);
 
+const ping= function (req, res) {
+    const ip=req.body.ip;
+    console.log(ip);
+    exec("ping -c 3 "+ip, function (err, stdout, stderr) {
+        console.log(stdout);
+        res.json({msg:stdout});
+    });
+    }
 app.post('/pingcheck',ping);
 
-const ping= function (req, res) {
-const ip=req.body.ip;
-exec("ping -c 3 "+ip, function (err, stdout, stderr) {
-    console.log(stdout);
-    res.json({msg:stdout});
-});
-}
+
 
 
 /* [
