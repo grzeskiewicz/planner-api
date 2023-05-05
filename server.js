@@ -37,8 +37,9 @@ app.post('/completewatering',db.completeWatering);
 
 const ping= function (req, res) {
     const ip=req.body.ip;
+    const port=req.body.port;
     console.log(ip);
-    exec("ping -c 3 "+ip, function (err, stdout, stderr) {
+    exec("telnet "+ ip + " " + port, function (err, stdout, stderr) {
         console.log(stdout);
         res.json({msg:stdout});
     });
