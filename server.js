@@ -51,10 +51,6 @@ const ping= function (req, res) {
     res.json({msg:"fail"});
     sock.destroy();
   });
-  /*setTimeout(()=>{
-    res.json({msg:"timeout"});
-    sock.destroy();
-  },5000);*/
     }
 app.post('/pingcheck',ping);
 
