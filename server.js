@@ -39,7 +39,7 @@ const ping= function (req, res) {
     const port=Number(req.body.port);
     console.log(ip,port);
     const sock = new net.Socket();
-    sock.setTimeout(3000, ()=>{
+    sock.setTimeout(5000, ()=>{
         console.log("timeout");
         res.json({msg:"timeout"});
     });
@@ -48,7 +48,7 @@ const ping= function (req, res) {
     res.json({msg:"connected"});
     sock.destroy();
   }).on('error',(e)=>{
-    res.json({msg:e});
+    res.json({msg:"fail"});
     sock.destroy();
   });
   /*setTimeout(()=>{
