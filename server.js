@@ -35,8 +35,8 @@ app.post('/schedulewatering',db.scheduleWatering);
 app.post('/completewatering',db.completeWatering);
 
 const ping= function (req, res) {
-    const ip=req.body.ip;
-    const port=req.body.port;
+    const ip=String(req.body.ip);
+    const port=Number(req.body.port);
     console.log(ip,port);
     const sock = new net.Socket();
     sock.setTimeout(2500);
