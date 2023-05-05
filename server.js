@@ -39,7 +39,10 @@ const ping= function (req, res) {
     const port=Number(req.body.port);
     console.log(ip,port);
     const sock = new net.Socket();
-    sock.setTimeout(500);
+    sock.setTimeout(3000, ()=>{
+        console.log("timeout");
+        res.json({msg:"timeout"});
+    });
   sock.connect(port, ip, function () {
     console.log("Client: Connected to server");
     res.json({msg:"connected"});
