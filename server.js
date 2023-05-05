@@ -45,7 +45,7 @@ const ping= function (req, res) {
     });
   sock.connect(port, ip, function () {
     console.log("Client: Connected to server");
-    res.json({msg:"connected"});
+    res.json({msg:"active"});
     sock.destroy();
   }).on('error',(e)=>{
     res.json({msg:"fail"});
