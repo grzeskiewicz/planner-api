@@ -6,8 +6,7 @@ const http = require('http').Server(app);
 const bodyParser = require('body-parser');
 const db = require('./db/database');
 const { body, validationResult } = require('express-validator');
-const exec = require('child_process').exec;
-
+const net = require('net');
 
 
 app.use(cors());
@@ -38,11 +37,17 @@ app.post('/completewatering',db.completeWatering);
 const ping= function (req, res) {
     const ip=req.body.ip;
     const port=req.body.port;
-    console.log(ip);
-    exec("telnet "+ ip + " " + port, function (err, stdout, stderr) {
-        console.log(stdout);
-        res.json({msg:stdout});
-    });
+    console.log(ip,port);
+    const sock = new net.Socket();
+    sock.setTimeout(2500);
+    sock.on('connect', function() {
+        console.log(ip+':'+port+' is up.');
+        sock.destroy();
+    }).on('error', function(e) {
+        console.log(ip+':'+port+' is down: ' + e.message);
+    }).on('timeout', function(e) {
+        console.log(ip+':'+port+' is down: timeout');
+    }).connect(ip, port);
     }
 app.post('/pingcheck',ping);
 
