@@ -39,22 +39,19 @@ const ping= function (req, res) {
     const port=Number(req.body.port);
     console.log(ip,port);
     const sock = new net.Socket();
-    sock.setTimeout(2500);
+    sock.setTimeout(500);
   sock.connect(port, ip, function () {
     console.log("Client: Connected to server");
     res.json({msg:"connected"});
     sock.destroy();
+  }).on('error',(e)=>{
+    res.json({msg:e});
+    sock.destroy();
   });
-  setTimeout(()=>{
+  /*setTimeout(()=>{
     res.json({msg:"timeout"});
     sock.destroy();
-  },5000);
-  
-      sock.on('error', function(e){
-        console.log(e);
-        res.json({msg:"fail"});
-    sock.destroy();
-    });
+  },5000);*/
     }
 app.post('/pingcheck',ping);
 
