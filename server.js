@@ -41,16 +41,15 @@ const ping= function (req, res) {
     const sock = new net.Socket();
     sock.setTimeout(2500);
   sock.connect(port, ip, function () {
-    sock.on('error', function(e){
-            console.log(e);
-
-            res.json({msg:"fail"});
-
-    });
     console.log("Client: Connected to server");
     res.json({msg:"connected"});
     sock.destroy();
   });
+      sock.on('error', function(e){
+        console.log(e);
+        res.json({msg:"fail"});
+    sock.destroy();
+    });
     }
 app.post('/pingcheck',ping);
 
