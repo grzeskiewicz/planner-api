@@ -40,17 +40,10 @@ const ping= function (req, res) {
     console.log(ip,port);
     const sock = new net.Socket();
     sock.setTimeout(2500);
-    sock.on('connect', function() {
-        console.log(ip+':'+port+' is up.');
-        res.json({msg:"active"});
-        sock.destroy();
-    }).on('error', function(e) {
-        console.log(ip+':'+port+' is down: ' + e.message);
-                res.json({msg:"down"});
-    }).on('timeout', function(e) {
-        console.log(ip+':'+port+' is down: timeout');
-                res.json({msg:"timeout"});
-    }).connect(ip, port);
+  sock.connect(port, ip, function () {
+    console.log("Client: Connected to server");
+    res.json({msg:"connected"});
+  });
     }
 app.post('/pingcheck',ping);
 
