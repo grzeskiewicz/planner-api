@@ -45,6 +45,11 @@ const ping= function (req, res) {
     res.json({msg:"connected"});
     sock.destroy();
   });
+  setTimeout(()=>{
+    res.json({msg:"timeout"});
+    sock.destroy();
+  },5000);
+  
       sock.on('error', function(e){
         console.log(e);
         res.json({msg:"fail"});
