@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Czas generowania: 21 Sty 2023, 17:10
+-- Czas generowania: 01 Lip 2023, 23:56
 -- Wersja serwera: 10.4.25-MariaDB
 -- Wersja PHP: 8.1.10
 
@@ -34,20 +34,22 @@ CREATE TABLE `crops` (
   `shelf_id` int(11) NOT NULL,
   `trays` int(11) NOT NULL,
   `notes` varchar(500) DEFAULT NULL,
-  `created_date` datetime NOT NULL DEFAULT current_timestamp()
+  `created_date` datetime NOT NULL DEFAULT current_timestamp(),
+  `scheduled` tinyint(1) NOT NULL DEFAULT 0,
+  `completed` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Zrzut danych tabeli `crops`
 --
 
-INSERT INTO `crops` (`id`, `harvest`, `microgreen_id`, `shelf_id`, `trays`, `notes`, `created_date`) VALUES
-(104, '2023-01-23 00:00:00', 1, 97, 1, 'Duża taca daikon, ziemia kokos: 900g. \nBlackout 18.01.2023. \nŚwiatło: \n+300ml wody 19.01.\n+300ml wody 20.01\n+400ml wody 21.01', '2023-01-15 21:10:52'),
-(108, '2023-01-23 00:00:00', 1, 98, 1, 'Mała taca, ziemia kokos: 580g, 42ml wody oprysk\nMieszanka rzodkiewek 6+5+5. Blackout 18.01.2022.\n20.01.2022 naświetlanie\n', '2023-01-15 22:06:32'),
-(112, '2023-01-29 00:00:00', 5, 99, 1, 'Mała taca, ziemia kokos: 770g dół,317g góra, 120ml wody oprysk', '2023-01-15 22:13:38'),
-(115, '2023-01-25 00:00:00', 4, 100, 1, 'Mała taca, ziemia kokos: 580g bez oprysku. Blackout od 18.01. 20.01.2022 naświetlanie. +200ml wody', '2023-01-15 22:16:00'),
-(119, '2023-01-25 00:00:00', 3, 101, 1, 'Afylla 220g, moczenie 10h. Start 21:00. Blackout od 12:25.\nOświetlenie 20.01 +300ml wody\n21.01 +350ml wody', '2023-01-16 23:50:34'),
-(120, '2023-01-25 00:00:00', 3, 102, 1, 'Maple 95g, mała taca mesh, moczenie 10h. Start 21:00. Blackout od 12:25. 20.01-naświetlanie +200ml wody (mesh tray - bez dolewania wody)', '2023-01-16 23:51:12');
+INSERT INTO `crops` (`id`, `harvest`, `microgreen_id`, `shelf_id`, `trays`, `notes`, `created_date`, `scheduled`, `completed`) VALUES
+(104, '2023-01-23 00:00:00', 1, 97, 1, 'Duża taca daikon, ziemia kokos: 900g. \nBlackout 18.01.2023. \nŚwiatło: \n+300ml wody 19.01.\n+300ml wody 20.01\n+400ml wody 21.01', '2023-01-15 21:10:52', 0, 0),
+(108, '2023-01-23 00:00:00', 1, 98, 1, 'Mała taca, ziemia kokos: 580g, 42ml wody oprysk\nMieszanka rzodkiewek 6+5+5. Blackout 18.01.2022.\n20.01.2022 naświetlanie\n', '2023-01-15 22:06:32', 0, 0),
+(112, '2023-01-29 00:00:00', 5, 99, 1, 'Mała taca, ziemia kokos: 770g dół,317g góra, 120ml wody oprysk', '2023-01-15 22:13:38', 0, 0),
+(115, '2023-01-25 00:00:00', 4, 100, 1, 'Mała taca, ziemia kokos: 580g bez oprysku. Blackout od 18.01. 20.01.2022 naświetlanie. +200ml wody', '2023-01-15 22:16:00', 0, 0),
+(119, '2023-01-25 00:00:00', 3, 101, 1, 'Afylla 220g, moczenie 10h. Start 21:00. Blackout od 12:25.\nOświetlenie 20.01 +300ml wody\n21.01 +350ml wody', '2023-01-16 23:50:34', 0, 0),
+(120, '2023-01-25 00:00:00', 3, 102, 1, 'Maple 95g, mała taca mesh, moczenie 10h. Start 21:00. Blackout od 12:25. 20.01-naświetlanie +200ml wody (mesh tray - bez dolewania wody)', '2023-01-16 23:51:12', 0, 0);
 
 -- --------------------------------------------------------
 
@@ -145,7 +147,7 @@ ALTER TABLE `shelves`
 -- AUTO_INCREMENT dla tabeli `crops`
 --
 ALTER TABLE `crops`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=130;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=131;
 
 --
 -- AUTO_INCREMENT dla tabeli `microgreens`
