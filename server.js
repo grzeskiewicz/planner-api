@@ -8,11 +8,13 @@ const db = require('./db/database');
 const { body, validationResult } = require('express-validator');
 const net = require('net');
 
-
-app.use(cors());
+var corsOptions = {
+    origin: 'http://localhost:3000'
+};
+app.use(cors(corsOptions));
 app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 app.use(bodyParser.json()); // support json encoded bodies 
-app.options('*', cors()) // include before other routes
+//app.options('*', cors()) // include before other routes
 
 
 app.get('/', (req, res) => res.send('Welcome!'));
