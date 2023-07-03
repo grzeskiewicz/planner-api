@@ -9,7 +9,9 @@ const { body, validationResult } = require('express-validator');
 const net = require('net');
 
 
-app.use(cors());
+app.use(cors({
+    origin:['http://watering.farmabracia.ovh','192.168.1.35','localhost']
+}));
 app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 app.use(bodyParser.json()); // support json encoded bodies 
 app.options('*', cors()) // include before other routes
