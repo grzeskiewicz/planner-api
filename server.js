@@ -10,11 +10,11 @@ const net = require('net');
 
 
 app.use(cors({
-    origin:['http://watering.farmabracia.ovh:3000','192.168.1.35:3000','localhost:3000']
+    origin:['http://watering.farmabracia.ovh:3000','http://192.168.1.35:3000','http://localhost:3000']
 }));
 app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 app.use(bodyParser.json()); // support json encoded bodies 
-app.options('*', cors()) // include before other routes
+//app.options('*', cors()) // include before other routes
 
 
 app.get('/', (req, res) => res.send('Welcome!'));
