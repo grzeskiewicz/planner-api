@@ -10,7 +10,7 @@ const net = require('net');
 
 
 app.use(cors({
-    origin:['http://watering.farmabracia.ovh:3000','http://192.168.1.35:3000','http://localhost:3000']
+    origin:'http://watering.farmabracia.ovh:3000'
 }));
 app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 app.use(bodyParser.json()); // support json encoded bodies 
