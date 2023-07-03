@@ -9,7 +9,7 @@ const { body, validationResult } = require('express-validator');
 const net = require('net');
 
 var corsOptions = {
-    origin: 'http://localhost:3000'
+    origin: '*'
 };
 app.use(cors(corsOptions));
 app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
