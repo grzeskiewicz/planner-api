@@ -79,6 +79,7 @@ const addMicrogreens = function (req, res, next) { //TODO:walidacja pól
 
 
 const deleteCrop = function (req, res, next) { 
+    console.log(req.body);
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
