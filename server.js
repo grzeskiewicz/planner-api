@@ -81,10 +81,12 @@ app.post('/addcrops',[
 
 
 
-
+/*
 app.post('/deletecrop',[
     body('crop_id').isInt().withMessage("Not integer!"),
-], db.deleteCrop);
+], db.deleteCrop);*/
+
+app.post('/deletecrop',db.deleteCrop);
 
 app.post('/savenotes',[
     body('crop_id').isInt().withMessage("Not integer!"),
