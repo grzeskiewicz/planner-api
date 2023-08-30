@@ -102,10 +102,10 @@ app.get('/crops', db.getCrops);
 app.get('/microgreens', db.getMicrogreens);
 app.get('/shelves', db.getShelves);
 
-const port = process.env.PORT || 3001,
-    ip = process.env.IP || '127.0.0.1';
+/*const port = process.env.PORT || 3001,
+    ip = process.env.IP || '127.0.0.1';*/
 
-    app.listen('3001', () => {console.log('NODEJS RUNNING')})
+app.listen('3001', () => {console.log('NODEJS RUNNING')})
 //http.listen(port);
 //console.log('Server running on http://%s:%s', ip,port);
 module.exports = app;
