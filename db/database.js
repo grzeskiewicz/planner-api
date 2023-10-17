@@ -196,10 +196,10 @@ if (i==0 ) {vals=`('${name}',${i})`} else {vals=vals.concat(',',`('${name}',${i}
 
 const editMicrogreens= function (req, res) {
     const microgreens = req.body;
+    console.log("MICRO EDIT:")
     console.log(microgreens);
     connection.query(`UPDATE microgreens SET name_en='${microgreens.name_en}',name_pl='${microgreens.name_pl}',grams_tray='${microgreens.grams_tray}'
-    , top_water='${microgreens.top_water}',bottom_water='${microgreens.bottom_water}',weight='${microgreens.weight}',blackout='${microgreens.blackout}'
-    ,light='${microgreens.light},color='${microgreens.color}' WHERE id='${microgreens.id}'`, function (err, result) {
+    , top_water='${microgreens.top_water}',bottom_water='${microgreens.bottom_water}',weight='${microgreens.weight}',blackout='${microgreens.blackout}',light='${microgreens.light},color='${microgreens.color}' WHERE id='${microgreens.id}'`, function (err, result) {
         if (err) {res.json({ success: false, msg: err }); return;}
         res.json({ success: true, msg: "MICROGREENS_EDITED" });
     });
