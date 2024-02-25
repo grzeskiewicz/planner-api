@@ -5,6 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "async": "*",
+    "axios": "^1.6.7",
     "body-parser": "*",
     "cors": "*",
     "dotenv": "^10.0.0",
