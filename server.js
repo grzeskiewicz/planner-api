@@ -104,7 +104,7 @@ const resetorangepi = function (req, res) {
     });
 };
 
-app.post("/resetorangepi", resetorangepi);
+app.get("/resetorangepi", resetorangepi);
 
 const ping = function (req, res) {
   const ip = String(req.body.ip);
