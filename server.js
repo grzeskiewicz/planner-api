@@ -104,7 +104,52 @@ const resetorangepi = function (req, res) {
     });
 };
 
+const turnSocketON=function(req,res){
+  const ip = String(req.body.ip);
+  const port = Number(req.body.port);
+  axios.get(`http://${ip}/cm?cmnd=Power%20on`)
+  .then((response) => {
+    if (response.data.POWER === "ON") res.json({ success: true, msg: "POWER ON" });
+
+
+  })
+  .catch((error) => {
+    console.log(error);
+    res.json({ success: false, msg: "CANT POWER ON" });
+  });
+}
+
+const turnSocketOFF=function(req,res){
+  const ip = String(req.body.ip);
+  const port = Number(req.body.port);
+  axios.get(`http://${ip}/cm?cmnd=Power%20off`)
+  .then((response) => {
+    if (response.data.POWER === "ON") res.json({ success: true, msg: "POWER OFF" });
+
+
+  })
+  .catch((error) => {
+    console.log(error);
+    res.json({ success: false, msg: "CANT POWER OFF" });
+  });
+}
+
+const getSocketInfo=function(req,res){
+  const ip = String(req.body.ip);
+  axios.get(`http://${ip}/cm?cmnd=Status`)
+  .then((response) => {
+     res.json({ data:response.data });
+  })
+  .catch((error) => {
+    console.log(error);
+    res.json({ error: error });
+  });
+}
+
 app.get("/resetorangepi", resetorangepi);
+app.post("/turnon",turnSocketON);
+app.post("/turnoff",turnSocketOFF);
+app.post("/getsocketinfo",getSocketInfo);
 
 const ping = function (req, res) {
   const ip = String(req.body.ip);
