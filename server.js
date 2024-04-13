@@ -190,7 +190,6 @@ app.post(
   "/addcrops",
   [
     body("microgreenID").isInt().withMessage("Not integer!"),
-    body("shelfID").isInt().withMessage("Not integer!"),
     body("trays").isInt().withMessage("Not integer!"),
     body("notes").isString().withMessage("Not string!").isLength({ max: 500 }),
   ],
@@ -229,8 +228,10 @@ app.post(
 );
 
 app.get("/crops", db.getCrops);
+app.get("/traydatecrops", db.getTrayDateCrops);
+
 app.get("/microgreens", db.getMicrogreens);
-app.get("/shelves", db.getShelves);
+app.get("/trays", db.getTrays);
 
 /*const port = process.env.PORT || 3001,
     ip = process.env.IP || '127.0.0.1';*/

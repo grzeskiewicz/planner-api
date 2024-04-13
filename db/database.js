@@ -39,21 +39,35 @@ handleDisconnect();
 
 const getCrops = function (req, res) {
     connection.query(`SELECT * FROM crops`, function (err, rows) {
-        if (err) res.json(err);
+        if (err) { res.json(err); return;}
+        res.json(rows);
+    });
+}
+
+const getTrays = function (req, res) {
+    connection.query(`SELECT * FROM trays`, function (err, rows) {
+        if (err) { res.json(err); return;}
+        res.json(rows);
+    });
+}
+
+const getTrayDateCrops = function (req, res) {
+    connection.query(`SELECT * FROM traydatecrop`, function (err, rows) {
+            if (err) { res.json(err); return;}
         res.json(rows);
     });
 }
 
 const getMicrogreens = function (req, res) {
     connection.query(`SELECT * FROM microgreens`, function (err, rows) {
-        if (err) res.json(err);
+        if (err) { res.json(err); return;}
         res.json(rows);
     });
 }
 
 const getShelves = function (req, res) {
     connection.query(`SELECT * FROM shelves`, function (err, rows) {
-        if (err) res.json(err);
+        if (err) { res.json(err); return;}
         res.json(rows);
     });
 }
@@ -105,7 +119,7 @@ const saveNotes = function (req, res, next) {
 }
 
 
-const addCrops = function (req, res, next) { // TODO2: pobieranie rekordow o tym samym shelfid z węższego zakresu (+15.-15?)
+const addCrops = function (req, res, next) {
    const errors = validationResult(req);
    let lightStartDate;
    const dataArr=[];
@@ -114,11 +128,11 @@ const addCrops = function (req, res, next) { // TODO2: pobieranie rekordow o tym
    if (!errors.isEmpty()) {res.status(400).json({ errors: errors.array()}); return;}
    
     for (const key of Object.keys(req.body)) dataArr.push(`'${req.body[key]}'`);
-    const [start,harvest,microgreenID,shelfID,trays,notes]=dataArr;
+    const [start,harvest,microgreenID,trays,notes]=dataArr;
     let vals;
  
     connection.query(`SELECT * FROM microgreens`, function (err, rows) {
-        if (err) res.json(err);
+        if (err) { res.json(err); return;}
         microgreensData=rows;
         microgreen=microgreensData.find(x=> x.id==req.body.microgreenID);
 
@@ -131,14 +145,27 @@ const addCrops = function (req, res, next) { // TODO2: pobieranie rekordow o tym
             const lightExposureStart=moment(blackoutStart).add(microgreen.blackout, "days");
             harvestDate=moment(lightExposureStart).add(microgreen.light, "days");
         }
-        vals=`('${moment(harvestDate).format('YYYY-MM-DD')}',${microgreenID},${shelfID},${trays},${notes})`;
+        vals=`('${moment(harvestDate).format('YYYY-MM-DD')}',${microgreenID},${trays},${notes})`;
 console.log('HARVEST DATE');
 console.log(harvestDate);
 console.log('light',microgreen.light);
 console.log("microgreenid", req.body.microgreenID);
-        lightStartDate=moment(harvestDate).subtract(microgreen.light, "days");
-        console.log(lightStartDate);
-        connection.query(`SELECT * FROM crops WHERE shelf_id=${shelfID}`, function (err, rowsx) {
+
+//wrzucanie rekordu crop bez walidacji zajętości półki
+connection.query("INSERT INTO crops (harvest,microgreen_id,trays,notes) VALUES" + vals, function (err, rows) {
+    if (err) {
+        res.json(err);
+    return;
+    }
+    res.json({ success: true, msg: 'CROP_ADDED' });
+});   
+
+        //SPRAWDZANIE CROPÓW CZY NIE NAKŁADAJĄ SIĘ NA 1 PÓŁCE, STARY REGAŁ
+
+     //   lightStartDate=moment(harvestDate).subtract(microgreen.light, "days");
+       // console.log(lightStartDate);
+
+     /*   connection.query(`SELECT * FROM crops WHERE shelf_id=${shelfID}`, function (err, rowsx) { 
     const sameShelfCrops=rowsx;
     let isTaken=false;
 
@@ -166,7 +193,10 @@ if((lightStartDate.isSameOrAfter(cropHarvest) || harvestDate.isSameOrBefore(crop
     });    
 }
 
-       });
+       });*/
+
+
+       
 
     });
 }
@@ -233,4 +263,4 @@ const completeWatering= function (req, res) {
 }
 
 
-module.exports = {getCrops, getMicrogreens,getShelves, addMicrogreens, addRacks, addCrops,editCrop,deleteCrop,editMicrogreens,saveNotes,scheduleWatering,completeWatering };
+module.exports = {getCrops,getTrayDateCrops ,getTrays,getMicrogreens,getShelves, addMicrogreens, addRacks, addCrops,editCrop,deleteCrop,editMicrogreens,saveNotes,scheduleWatering,completeWatering };
