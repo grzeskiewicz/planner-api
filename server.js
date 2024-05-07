@@ -213,6 +213,15 @@ app.post(
 );
 
 app.post(
+  "/savescheduletdc",
+  [
+    body("crop_id").isInt().withMessage("Not integer!"),
+  ],
+  db.saveScheduleTDC
+);
+
+
+app.post(
   "/addracks",
   [
     body("name")
@@ -232,6 +241,8 @@ app.get("/traydatecrops", db.getTrayDateCrops);
 
 app.get("/microgreens", db.getMicrogreens);
 app.get("/trays", db.getTrays);
+app.get("/fndtrays", db.getFNDTrays);
+
 
 /*const port = process.env.PORT || 3001,
     ip = process.env.IP || '127.0.0.1';*/
