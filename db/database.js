@@ -52,8 +52,12 @@ const getTrays = function (req, res) {
     });
 }
 
-const getTrayDateCrops = function (req, res) {
-    connection.query(`SELECT * FROM traydatecrop`, function (err, rows) {
+const getTrayDateCrops = function (req, res) { //~5 months of data instead of all
+    const dateNow=moment()
+    const dateFrom=moment(dateNow).subtract(2,"months").startOf("month").format('YYYY-MM-DD');;
+    const dateTo=moment(dateNow).add(2,"months").endOf("month").format('YYYY-MM-DD');
+    console.log(dateFrom,dateTo);
+    connection.query(`SELECT * FROM traydatecrop WHERE date between '${dateFrom}' and '${dateTo}'`, function (err, rows) {
         if (err) { res.json(err); return; }
         res.json(rows);
     });
@@ -88,7 +92,7 @@ const addMicrogreens = function (req, res, next) { //TODO:walidacja pól
         return res.status(400).json({ errors: errors.array() });
         return;
     }
-    console.log(req.body)
+    //console.log(req.body)
     for (const key of Object.keys(req.body)) dataArr.push(`'${req.body[key]}'`);
     const [nameEN, namePL, gramsTray, topWater, bottomWater, weight, blackout, light, color] = dataArr;
     const vals = `(${nameEN},${namePL},${gramsTray},${topWater},${bottomWater},${weight},${blackout},${light},${color})`
@@ -107,7 +111,7 @@ const deleteCrop = function (req, res, next) {
         return res.status(400).json({ errors: errors.array() });
         return;
     }
-    connection.query(`DELETE FROM crops WHERE id='${req.body.crop_id}'`, function (err, rows) {
+    connection.query(`DELETE FROM crops WHERE id='${req.body.crop_id}'`, function (err, rows) { //dodatkowo ustawia triggerem status=0 w tdc
         if (err) { res.json({ success: false, err: err }); return; }
         res.json({ success: true, msg: 'CROP_DELETED' });
     });
@@ -128,47 +132,54 @@ const saveNotes = function (req, res, next) {
 
 const saveScheduleTDC = function (req, res, next) {
     //console.log(req.body)
+    const light=req.body.light;
     const resetTrays = req.body.tdcs.filter((x) => x.status === "0");
     const resetTraysIDs = resetTrays.map((x) => x.id);
-    const fillTrays = req.body.tdcs.filter((x) => x.status === "1");
+    const fillTrays = req.body.tdcs.filter((x) => x.status === "1" && x.crop_id===req.body.crop_id);
     const fillTraysIDs = fillTrays.map((x) => x.id);
-    console.log(req.body.tdcs);
     const errors = validationResult(req);
-    //  console.log(`UPDATE traydatecrop SET crop_id='${req.body.crop_id}' WHERE id IN '(${tdcs.join(",")})'`)
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
         return;
     }
-    connection.query(`UPDATE traydatecrop SET crop_id='${req.body.crop_id}', status='1' WHERE id IN (${fillTraysIDs.join(",")})`
-        , function (err, rows) {
+
+//console.log(fillTraysIDs,resetTraysIDs)
+let fillDone=false;
+let resetDone=false;
+    if (fillTraysIDs && fillTraysIDs.length > 0) {
+        connection.query(`UPDATE traydatecrop SET crop_id='${req.body.crop_id}', status='1' WHERE id IN (${fillTraysIDs.join(",")})`, function (err, rows) {
             if (err) { res.json({ success: false, err: err }); return; }
 
-            connection.query(`UPDATE crops SET harvest='${moment(req.body.harvest).format('YYYY-MM-DD')}' WHERE id='${req.body.crop_id}'`, function (err, rows) {
+            connection.query(`UPDATE crops SET harvest='${moment(req.body.harvest).format('YYYY-MM-DD')}', trays= ${fillTraysIDs.length/light} WHERE id='${req.body.crop_id}'`, function (err, rows) {
                 if (err) { res.json({ success: false, err: err }); return; }
-
-                if (resetTraysIDs && resetTraysIDs.length > 0) {
-                    connection.query(`UPDATE traydatecrop SET crop_id=NULL, status='0' WHERE id IN (${resetTraysIDs.join(",")})`, function (err, rows) {
-                        if (err) { res.json({ success: false, err: err }); return; }
-                        res.json({ success: true, msg: 'SCHEDULE_SAVED' });
-                    })
-                } else {
-                    res.json({ success: true, msg: 'SCHEDULE_SAVED' });
-                }
-
-
-
-
-            });
+fillDone=true;
         });
+
+    });
+} else {fillDone=true}
+    if (resetTraysIDs && resetTraysIDs.length > 0) {
+        connection.query(`UPDATE traydatecrop SET crop_id=NULL, status='0' WHERE id IN (${resetTraysIDs.join(",")})`, function (err, rows) {
+             if (err) { res.json({ success: false, err: err }); return; }
+
+             connection.query(`UPDATE crops SET harvest='${moment(req.body.harvest).format('YYYY-MM-DD')}' WHERE id='${req.body.crop_id}'`, function (err, rows) {
+                if (err) { res.json({ success: false, err: err }); return; }
+resetDone=true;
+        });
+                    });
+                } else {resetDone=true}
+            
+        if (fillDone && resetDone) {
+            res.json({ success: true, msg: "SAVE_SCHEDULED"}); 
+        }
 }
 
 
 const addCrops = function (req, res, next) {
     const errors = validationResult(req);
     if (!errors.isEmpty()) { res.status(400).json({ errors: errors.array() }); return; }
-    vals = `('${req.body.microgreenID}','${req.body.trays}','${req.body.notes}')`;
+    vals = `('${req.body.microgreenID}','${req.body.notes}')`;
     //wrzucanie rekordu crop bez walidacji zajętości półki
-    connection.query("INSERT INTO crops (microgreen_id,trays,notes) VALUES" + vals, function (err, rows) {
+    connection.query("INSERT INTO crops (microgreen_id,notes) VALUES" + vals, function (err, rows) {
         if (err) { res.json({ success: false, err: err }); return; }
         res.json({ success: true, msg: 'CROP_ADDED' });
     });
@@ -219,7 +230,7 @@ const editCrop = function (req, res) {
 
 const scheduleWatering = function (req, res) {
     const crop = req.body.crop;
-    console.log(crop);
+  //  console.log(crop);
     connection.query(`UPDATE crops SET scheduled='1' WHERE id='${crop}'`, function (err, result) {
         if (err) { res.json({ success: false, msg: err }); return; }
         res.json({ succes: true, msg: "CROP_SCHEDULED" });

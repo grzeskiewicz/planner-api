@@ -190,7 +190,7 @@ app.post(
   "/addcrops",
   [
     body("microgreenID").isInt().withMessage("Not integer!"),
-    body("trays").isInt().withMessage("Not integer!"),
+ //   body("trays").isInt().withMessage("Not integer!"),
     body("notes").isString().withMessage("Not string!").isLength({ max: 500 }),
   ],
   db.addCrops
