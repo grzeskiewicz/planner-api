@@ -139,10 +139,12 @@ const getSocketInfo=function(req,res){
   axios.get(`http://${ip}/cm?cmnd=Status`)
   .then((response) => {
      res.json({ data:response.data });
+     return;
   })
   .catch((error) => {
     console.log(error);
     res.json({ error: error });
+    return;
   });
 }
 
@@ -156,19 +158,22 @@ const ping = function (req, res) {
   const port = Number(req.body.port);
   console.log(ip, port);
   const sock = new net.Socket();
-  sock.setTimeout(5000, () => {
+  sock.setTimeout(8000, () => {
     console.log("timeout");
     res.json({ msg: "timeout" });
+    return;
   });
   sock
     .connect(port, ip, function () {
       console.log("Client: Connected to server");
-      res.json({ msg: "active" });
       sock.destroy();
+      res.json({ msg: "active" });
+      return;
     })
     .on("error", (e) => {
-      res.json({ msg: "fail" });
-      sock.destroy();
+    //  sock.destroy();
+     // res.json({ msg: "fail" });
+     // return;
     });
 };
 app.post("/pingcheck", ping);

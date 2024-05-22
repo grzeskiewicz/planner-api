@@ -2,12 +2,17 @@ const mysql = require('mysql2');
 const moment = require('moment');
 const dbConfig = require('./dbConfig');
 const { body, validationResult } = require('express-validator');
+const util = require("util"); 
+const { constant } = require('async');
+
 
 let connection;
 
 function handleDisconnect() {
     connection = mysql.createConnection(dbConfig.config); // Recreate the connection, since
     // the old one cannot be reused.
+    connection.query = util.promisify(connection.query).bind(connection);
+
 
     connection.connect(function (err) {              // The server is either down
         if (err) {                                     // or restarting (takes a while sometimes).
@@ -56,7 +61,6 @@ const getTrayDateCrops = function (req, res) { //~5 months of data instead of al
     const dateNow=moment()
     const dateFrom=moment(dateNow).subtract(2,"months").startOf("month").format('YYYY-MM-DD');;
     const dateTo=moment(dateNow).add(2,"months").endOf("month").format('YYYY-MM-DD');
-    console.log(dateFrom,dateTo);
     connection.query(`SELECT * FROM traydatecrop WHERE date between '${dateFrom}' and '${dateTo}'`, function (err, rows) {
         if (err) { res.json(err); return; }
         res.json(rows);
@@ -92,7 +96,6 @@ const addMicrogreens = function (req, res, next) { //TODO:walidacja pól
         return res.status(400).json({ errors: errors.array() });
         return;
     }
-    //console.log(req.body)
     for (const key of Object.keys(req.body)) dataArr.push(`'${req.body[key]}'`);
     const [nameEN, namePL, gramsTray, topWater, bottomWater, weight, blackout, light, color] = dataArr;
     const vals = `(${nameEN},${namePL},${gramsTray},${topWater},${bottomWater},${weight},${blackout},${light},${color})`
@@ -105,7 +108,6 @@ const addMicrogreens = function (req, res, next) { //TODO:walidacja pól
 
 
 const deleteCrop = function (req, res, next) {
-    console.log(req.body);
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
@@ -130,47 +132,77 @@ const saveNotes = function (req, res, next) {
         });
 }
 
-const saveScheduleTDC = function (req, res, next) {
-    //console.log(req.body)
-    const light=req.body.light;
-    const resetTrays = req.body.tdcs.filter((x) => x.status === "0");
+
+
+function resetTrays(resetTrays,cropID,harvest){
+    const harvestM=harvest===null ? 'NULL' : `'${moment(harvest).format('YYYY-MM-DD')}'`;
     const resetTraysIDs = resetTrays.map((x) => x.id);
-    const fillTrays = req.body.tdcs.filter((x) => x.status === "1" && x.crop_id===req.body.crop_id);
+    if (resetTraysIDs.length===0) return new Promise(function(resolve, reject) {resolve({success: true});});
+
+    return new Promise(function(resolve, reject) {
+
+   connection.query(`UPDATE traydatecrop SET crop_id=NULL, status='0' WHERE id IN (${resetTraysIDs.join(",")})`, function (err, rows) {
+
+    if (err) reject ({success: false, err:err});
+
+       connection.query(`UPDATE crops SET harvest=${harvestM} WHERE id='${cropID}'`, function (err, rows) {
+            if (err)  reject ({success: false, err:err});
+            resolve({success: true});
+        });
+               });
+            });
+
+}
+
+function fillTrays(fillTrays,cropID,harvest,light){
     const fillTraysIDs = fillTrays.map((x) => x.id);
+
+    if (fillTraysIDs.length===0) return new Promise(function(resolve, reject) {
+        connection.query(`UPDATE crops SET trays='0' WHERE id='${cropID}'`, function (err, rows) {
+            if (err) reject (err);
+                resolve({success: true});
+            });
+
+});
+ 
+    return new Promise(function(resolve, reject) {
+
+  connection.query(`UPDATE traydatecrop SET crop_id='${cropID}', status='1' WHERE id IN (${fillTraysIDs.join(",")})`, function (err, rows) {
+        if (err) reject({ success: false, err: err })
+
+       connection.query(`UPDATE crops SET harvest='${harvest}', trays= ${fillTraysIDs.length/light} WHERE id='${cropID}'`, function (err, rows) {
+        if (err) reject (err);
+            resolve({success: true});
+        });
+});
+    });
+}
+
+
+
+function saveScheduleTDC (req, res, next) {
+    const light=req.body.light;
+    const reset = req.body.tdcs.filter((x) => x.status === "0");
+    const fill = req.body.tdcs.filter((x) => x.status === "1" && x.crop_id===req.body.crop_id);
+    const harvest=req.body.harvest;
+    const cropID=req.body.crop_id;
+
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
         return;
     }
 
-//console.log(fillTraysIDs,resetTraysIDs)
-let fillDone=false;
-let resetDone=false;
-    if (fillTraysIDs && fillTraysIDs.length > 0) {
-        connection.query(`UPDATE traydatecrop SET crop_id='${req.body.crop_id}', status='1' WHERE id IN (${fillTraysIDs.join(",")})`, function (err, rows) {
-            if (err) { res.json({ success: false, err: err }); return; }
-
-            connection.query(`UPDATE crops SET harvest='${moment(req.body.harvest).format('YYYY-MM-DD')}', trays= ${fillTraysIDs.length/light} WHERE id='${req.body.crop_id}'`, function (err, rows) {
-                if (err) { res.json({ success: false, err: err }); return; }
-fillDone=true;
-        });
-
+resetTrays(reset,cropID,harvest).then((reset)=>{
+    if (reset.success) {
+        fillTrays(fill,cropID,harvest,light).then((fill)=>{
+    if (fill.success){
+        res.json({ success: true, msg: "SAVE_SCHEDULED"}); 
+}
     });
-} else {fillDone=true}
-    if (resetTraysIDs && resetTraysIDs.length > 0) {
-        connection.query(`UPDATE traydatecrop SET crop_id=NULL, status='0' WHERE id IN (${resetTraysIDs.join(",")})`, function (err, rows) {
-             if (err) { res.json({ success: false, err: err }); return; }
+    }
 
-             connection.query(`UPDATE crops SET harvest='${moment(req.body.harvest).format('YYYY-MM-DD')}' WHERE id='${req.body.crop_id}'`, function (err, rows) {
-                if (err) { res.json({ success: false, err: err }); return; }
-resetDone=true;
-        });
-                    });
-                } else {resetDone=true}
-            
-        if (fillDone && resetDone) {
-            res.json({ success: true, msg: "SAVE_SCHEDULED"}); 
-        }
+});
 }
 
 
