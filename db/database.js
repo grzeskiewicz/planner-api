@@ -135,7 +135,7 @@ const saveNotes = function (req, res, next) {
 
 
 function resetTrays(resetTrays,cropID,harvest){
-    const harvestM=harvest===null ? 'NULL' : `'${moment(harvest).format('YYYY-MM-DD')}'`;
+    const harvestM=harvest===null ? 'NULL' : `'${moment(harvest).format('YYYY-MM-DD HH:mm')}'`;
     const resetTraysIDs = resetTrays.map((x) => x.id);
     if (resetTraysIDs.length===0) return new Promise(function(resolve, reject) {resolve({success: true});});
 
@@ -170,7 +170,7 @@ function fillTrays(fillTrays,cropID,harvest,light){
   connection.query(`UPDATE traydatecrop SET crop_id='${cropID}', status='1' WHERE id IN (${fillTraysIDs.join(",")})`, function (err, rows) {
         if (err) reject({ success: false, err: err })
 
-       connection.query(`UPDATE crops SET harvest='${harvest}', trays= ${fillTraysIDs.length/light} WHERE id='${cropID}'`, function (err, rows) {
+       connection.query(`UPDATE crops SET harvest='${moment(harvest).format('YYYY-MM-DD HH:mm')}', trays= ${fillTraysIDs.length/light} WHERE id='${cropID}'`, function (err, rows) {
         if (err) reject (err);
             resolve({success: true});
         });
