@@ -207,14 +207,21 @@ resetTrays(reset,cropID,harvest).then((reset)=>{
 
 
 const addCrops = function (req, res, next) {
+    console.log(req.body);
     const errors = validationResult(req);
     if (!errors.isEmpty()) { res.status(400).json({ errors: errors.array() }); return; }
     vals = `('${req.body.microgreenID}','${req.body.notes}')`;
     //wrzucanie rekordu crop bez walidacji zajętości półki
+    console.log("ADD CROPS")
+    console.log(vals);
     connection.query("INSERT INTO crops (microgreen_id,notes) VALUES" + vals, function (err, rows) {
-        if (err) { res.json({ success: false, err: err }); return; }
-        res.json({ success: true, msg: 'CROP_ADDED' });
+        
+        if (err) { res.json({ success: false, err: err }); console.log(err);  return; }
+    connection.query(`SELECT * FROM crops WHERE id='${rows.insertId}'`, function (err, cropData) {
+        res.json({ success: true, msg: 'CROP_ADDED',crop:cropData[0] });
     });
+});
+    
 }
 
 
