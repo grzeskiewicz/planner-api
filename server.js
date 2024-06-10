@@ -34,12 +34,8 @@ app.post(
       .isLength({ max: 60 })
       .withMessage("Too long value!"),
     body("gramsTray").isInt().withMessage("Not integer!"),
-    body("topWater")
-      .isInt({ max: 1000 })
-      .withMessage("Not integer or too high value!"),
-    body("bottomWater")
-      .isInt({ max: 1000 })
-      .withMessage("Not integer or too high value!"),
+    body("gramsHarvest").isInt().withMessage("Not integer!"),
+    body("wateringLevel").isInt().withMessage("Not integer!"),
     body("weight")
       .isInt({ max: 15 })
       .withMessage("Not integer or too high value!"),
@@ -59,6 +55,10 @@ app.post(
 );
 
 app.post("/editmicrogreens", db.editMicrogreens);
+app.post("/editcustomer", db.editCustomer);
+app.post("/editorder", db.editOrder);
+
+
 app.post("/schedulewatering", db.scheduleWatering);
 app.post("/completewatering", db.completeWatering);
 
@@ -195,11 +195,41 @@ app.post(
   "/addcrops",
   [
     body("microgreenID").isInt().withMessage("Not integer!"),
- //   body("trays").isInt().withMessage("Not integer!"),
     body("notes").isString().withMessage("Not string!").isLength({ max: 500 }),
   ],
   db.addCrops
 );
+
+app.post(
+  "/addorder",
+  [
+    body("customerID").isInt().withMessage("Not integer!"),
+    body("notes").isString().withMessage("Not string!").isLength({ max: 200 }),
+  ],
+  db.addOrder
+);
+
+
+app.post(
+  "/addcustomer",
+  [
+    body("companyName")
+      .isString()
+      .withMessage("Not a string!")
+      .isLength({ max: 200 })
+      .withMessage("Too long value!"),
+    body("customerAddress")
+      .isString()
+      .withMessage("Not a string!")
+      .isLength({ max: 200 })
+      .withMessage("Too long value!"),
+    body("customerPostcode").isString().withMessage("Not a string!")
+    .isLength({ max: 6 })
+    .withMessage("Too long value!"),
+  ],
+  db.addCustomer
+);
+
 
 /*
 app.post('/deletecrop',[
@@ -247,6 +277,9 @@ app.get("/traydatecrops", db.getTrayDateCrops);
 app.get("/microgreens", db.getMicrogreens);
 app.get("/trays", db.getTrays);
 app.get("/fndtrays", db.getFNDTrays);
+app.get("/customers", db.getCustomers);
+app.get("/orders", db.getOrders);
+
 
 
 /*const port = process.env.PORT || 3001,

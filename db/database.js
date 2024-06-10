@@ -74,6 +74,24 @@ const getMicrogreens = function (req, res) {
     });
 }
 
+const getCustomers = function (req, res) {
+    connection.query(`SELECT * FROM customers`, function (err, rows) {
+        if (err) { res.json(err); return; }
+        res.json(rows);
+    });
+}
+
+
+
+const getOrders = function (req, res) {
+    connection.query(`SELECT orders.id, orders.microgreen_id,orders.weight, customerorder.id, customerorder.customer_id, customerorder.delivery_date,customerorder.notes
+    FROM orders
+    INNER JOIN customerorder ON orders.order_id = customerorder.id`, function (err, rows) {
+        if (err) { res.json(err); return; }
+        res.json(rows);
+    });
+}
+
 const getShelves = function (req, res) {
     connection.query(`SELECT * FROM shelves`, function (err, rows) {
         if (err) { res.json(err); return; }
@@ -92,14 +110,16 @@ const getFNDTrays= function (req, res) {
 const addMicrogreens = function (req, res, next) { //TODO:walidacja pól
     const dataArr = [];
     const errors = validationResult(req);
+   console.log(req.body);
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
         return;
     }
     for (const key of Object.keys(req.body)) dataArr.push(`'${req.body[key]}'`);
-    const [nameEN, namePL, gramsTray, topWater, bottomWater, weight, blackout, light, color] = dataArr;
-    const vals = `(${nameEN},${namePL},${gramsTray},${topWater},${bottomWater},${weight},${blackout},${light},${color})`
-    connection.query("INSERT INTO microgreens (name_en,name_pl,grams_tray,top_water,bottom_water,weight,blackout,light,color) VALUES" + vals, function (err, rows) {
+    const [nameEN, namePL, gramsTray, gramsHarvest,wateringLevel, weight, blackout, light, color] = dataArr;
+    const vals = `(${nameEN},${namePL},${gramsTray},${gramsHarvest},${wateringLevel},${weight},${blackout},${light},${color})`;
+    console.log(vals);
+    connection.query("INSERT INTO microgreens (name_en,name_pl,grams_tray,grams_harvest,watering_level,weight,blackout,light,color) VALUES" + vals, function (err, rows) {
         if (err) { res.json({ success: false, err: err }); return; }
         res.json({ success: true, msg: 'MICROGREENS_ADDED' });
     });
@@ -224,6 +244,54 @@ const addCrops = function (req, res, next) {
     
 }
 
+const addOrder = function (req, res, next) {
+    console.log(req.body);
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) { res.status(400).json({ errors: errors.array() }); return; }
+    valsOrder = `('${req.body.customerID}','${req.body.deliveryDate}','${req.body.notes}')`;
+    console.log("ADD ORDER")
+    console.log(valsOrder);
+    const orders=req.body.orders;
+    connection.query("INSERT INTO customerorder (customer_id,delivery_date,notes) VALUES" + valsOrder, function (err, rows) {
+        if (err) { res.json({ success: false, err: err }); console.log(err);  return; }
+        const orderID=rows.insertId;
+
+const ordersMap=orders.map((x)=>`('${orderID}','${x.microgreenID}',${x.weight})`);
+        console.log(ordersMap);
+        connection.query("INSERT INTO orders (order_id,microgreen_id,weight) VALUES" + ordersMap, function (err, rows) {
+            if (err) { res.json({ success: false, err: err }); console.log(err);  return; }
+            res.json({ success: true, msg: 'ORDER_ADDED'});
+        });
+   
+});
+    
+}
+
+const addCustomer = function (req, res, next) {
+    const dataArr = [];
+    const errors = validationResult(req);
+   //console.log(req.body);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+        return;
+    }
+    for (const key of Object.keys(req.body)) dataArr.push(`'${req.body[key]}'`);
+    const [companyName,NIP,REGON,customerAddress,customerPostcode,customerLocation,customerVoivodeship,customerFullname,PESEL,deliveryAddress,
+        deliveryPostcode,deliveryLocation,deliveryVoivodeship,customerEmail,customerTelephone1,customerTelephone2] = dataArr;
+    const vals = `(${companyName},${NIP},${REGON},${customerAddress},${customerPostcode},${customerLocation},${customerVoivodeship},${customerFullname},${PESEL},${deliveryAddress},
+        ${deliveryPostcode},${deliveryLocation},${deliveryVoivodeship},${customerEmail},${customerTelephone1},${customerTelephone2})`;
+    console.log(vals);
+    connection.query("INSERT INTO customers (company_name,company_nip,company_regon,customer_address,customer_postcode, customer_location,customer_voivodeship,customer_fullname,customer_pesel,delivery_address,delivery_postcode,delivery_location,delivery_voivodeship,customer_email,customer_telephone1,customer_telephone2) VALUES" + vals, function (err, rows) {
+        if (err) { res.json({ success: false, err: err }); return; }
+        res.json({ success: true, msg: 'CUSTOMER_ADDED' });
+    });
+}
+
+
+
+
+
+
 
 const addRacks = function (req, res, next) {
     const errors = validationResult(req);
@@ -252,9 +320,24 @@ const editMicrogreens = function (req, res) {
     console.log("MICRO EDIT:")
     console.log(microgreens);
     connection.query(`UPDATE microgreens SET name_en='${microgreens.name_en}',name_pl='${microgreens.name_pl}',grams_tray='${microgreens.grams_tray}'
-    , top_water='${microgreens.top_water}',bottom_water='${microgreens.bottom_water}',weight='${microgreens.weight}',blackout='${microgreens.blackout}',light='${microgreens.light}',color='${microgreens.color}' WHERE id='${microgreens.id}'`, function (err, result) {
+    , grams_harvest='${microgreens.grams_harvest}',watering_level='${microgreens.watering_level}',weight='${microgreens.weight}',blackout='${microgreens.blackout}',light='${microgreens.light}',color='${microgreens.color}' WHERE id='${microgreens.id}'`, function (err, result) {
         if (err) { res.json({ success: false, msg: err }); return; }
         res.json({ success: true, msg: "MICROGREENS_EDITED" });
+    });
+}
+
+
+const editOrder = function (req, res) {
+    const order = req.body;
+    console.log("ORDER EDIT:")
+    console.log(order);
+    connection.query(`UPDATE customerorder SET delivery_date='${order.delivery_date}', notes='${order.notes} WHERE id=${order.id}`, function (err, result) {
+        if (err) { res.json({ success: false, msg: err }); return; }
+
+        connection.query(`UPDATE orders SET  WHERE order_id=${order.id}`, function (err, result) {
+            if (err) { res.json({ success: false, msg: err }); return; }
+            res.json({ success: true, msg: "ORDER_EDITED" });
+        });
     });
 }
 
@@ -264,6 +347,20 @@ const editCrop = function (req, res) {
     , trays='${crop.tray}',notes='${crop.notes}' WHERE id='${crop.id}'`, function (err, result) {
         if (err) { res.json({ success: false, msg: err }); return; }
         res.json({ succes: true, msg: "CROP_EDITED" });
+    });
+}
+
+const editCustomer = function (req, res) {
+    const customer = req.body;
+    console.log("CUSTOMER EDIT:")
+    console.log(customer);
+    connection.query(`UPDATE customers SET company_name='${customer.company_name}',company_nip='${customer.company_nip}',company_regon='${customer.company_regon}',customer_address='${customer.customer_address}'
+    ,customer_postcode='${customer.customer_postcode}', customer_location='${customer.customer_location}',customer_voivodeship='${customer.customer_voivodeship}'
+    ,customer_fullname='${customer.customer_fullname}',customer_pesel='${customer.customer_pesel}'
+    ,delivery_address='${customer.delivery_address}',delivery_postcode='${customer.delivery_postcode}',delivery_location='${customer.delivery_location}',delivery_voivodeship='${customer.delivery_voivodeship}'
+    ,customer_email='${customer.customer_email}',customer_telephone1='${customer.customer_telephone1}',customer_telephone2='${customer.customer_telephone2}' WHERE id='${customer.id}'`, function (err, result) {
+        if (err) { res.json({ success: false, msg: err }); return; }
+        res.json({ success: true, msg: "CUSTOMER_EDITED" });
     });
 }
 
@@ -286,4 +383,4 @@ const completeWatering = function (req, res) {
 }
 
 
-module.exports = { getCrops, getTrayDateCrops,getFNDTrays, getTrays, getMicrogreens, getShelves, addMicrogreens, addRacks, addCrops, editCrop, deleteCrop, editMicrogreens, saveNotes, scheduleWatering, completeWatering, saveScheduleTDC };
+module.exports = { getCrops, getTrayDateCrops,getFNDTrays, getTrays, getMicrogreens, getShelves,getCustomers,getOrders, addMicrogreens, addRacks, addCrops,addOrder,addCustomer, editCrop,editOrder, deleteCrop, editMicrogreens,editCustomer, saveNotes, scheduleWatering, completeWatering, saveScheduleTDC };
