@@ -92,6 +92,14 @@ const getOrders = function (req, res) {
     });
 }
 
+/*
+const getOrders = function (req, res) {
+    connection.query(`SELECT * FROM orders`, function (err, rows) {
+        if (err) { res.json(err); return; }
+        res.json(rows);
+    });
+}*/
+
 const getShelves = function (req, res) {
     connection.query(`SELECT * FROM shelves`, function (err, rows) {
         if (err) { res.json(err); return; }
@@ -250,13 +258,14 @@ const addOrder = function (req, res, next) {
     if (!errors.isEmpty()) { res.status(400).json({ errors: errors.array() }); return; }
     valsOrder = `('${req.body.customerID}','${req.body.deliveryDate}','${req.body.notes}')`;
     console.log("ADD ORDER")
-    console.log(valsOrder);
+    //console.log(valsOrder);
     const orders=req.body.orders;
     connection.query("INSERT INTO customerorder (customer_id,delivery_date,notes) VALUES" + valsOrder, function (err, rows) {
         if (err) { res.json({ success: false, err: err }); console.log(err);  return; }
         const orderID=rows.insertId;
 
-const ordersMap=orders.map((x)=>`('${orderID}','${x.microgreenID}',${x.weight})`);
+const ordersMap=orders.map((x)=>`('${orderID}','${x.microgreensID}',${x.weight})`);
+console.log("MEEEE")
         console.log(ordersMap);
         connection.query("INSERT INTO orders (order_id,microgreen_id,weight) VALUES" + ordersMap, function (err, rows) {
             if (err) { res.json({ success: false, err: err }); console.log(err);  return; }
