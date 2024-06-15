@@ -86,7 +86,7 @@ const getCustomers = function (req, res) {
 const getOrders = function (req, res) {
     connection.query(`SELECT orders.id, orders.microgreen_id,orders.weight, customerorder.id, customerorder.customer_id, customerorder.delivery_date,customerorder.notes
     FROM orders
-    INNER JOIN customerorder ON orders.order_id = customerorder.id`, function (err, rows) {
+    INNER JOIN customerorder ON orders.order_id = customerorder.id ORDER BY customerorder.delivery_date`, function (err, rows) {
         if (err) { res.json(err); return; }
         res.json(rows);
     });
@@ -118,7 +118,6 @@ const getFNDTrays= function (req, res) {
 const addMicrogreens = function (req, res, next) { //TODO:walidacja pól
     const dataArr = [];
     const errors = validationResult(req);
-   console.log(req.body);
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
         return;
@@ -126,7 +125,7 @@ const addMicrogreens = function (req, res, next) { //TODO:walidacja pól
     for (const key of Object.keys(req.body)) dataArr.push(`'${req.body[key]}'`);
     const [nameEN, namePL, gramsTray, gramsHarvest,wateringLevel, weight, blackout, light, color] = dataArr;
     const vals = `(${nameEN},${namePL},${gramsTray},${gramsHarvest},${wateringLevel},${weight},${blackout},${light},${color})`;
-    console.log(vals);
+
     connection.query("INSERT INTO microgreens (name_en,name_pl,grams_tray,grams_harvest,watering_level,weight,blackout,light,color) VALUES" + vals, function (err, rows) {
         if (err) { res.json({ success: false, err: err }); return; }
         res.json({ success: true, msg: 'MICROGREENS_ADDED' });
@@ -144,6 +143,58 @@ const deleteCrop = function (req, res, next) {
     connection.query(`DELETE FROM crops WHERE id='${req.body.crop_id}'`, function (err, rows) { //dodatkowo ustawia triggerem status=0 w tdc
         if (err) { res.json({ success: false, err: err }); return; }
         res.json({ success: true, msg: 'CROP_DELETED' });
+    });
+}
+
+const deleteMicrogreens = function (req, res, next) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+        return;
+    }
+    console.log("MICRO",req.body)
+    connection.query(`DELETE FROM microgreens WHERE id='${req.body.id}'`, function (err, rows) { //dodatkowo ustawia triggerem status=0 w tdc
+        if (err) { res.json({ success: false, err: err }); return; }
+        res.json({ success: true, msg: 'MICROGREENS_DELETED' });
+    });
+}
+
+const lockCustomer = function (req, res, next) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+        return;
+    }
+    connection.query(`UPDATE customers SET is_active='0' WHERE id='${req.body.id}'`, function (err, rows) { //dodatkowo ustawia triggerem status=0 w tdc
+        if (err) { res.json({ success: false, err: err }); return; }
+        res.json({ success: true, msg: 'CUSTOMER_LOCKED' });
+    });
+}
+
+const unlockCustomer = function (req, res, next) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+        return;
+    }
+    connection.query(`UPDATE customers SET is_active='1' WHERE id='${req.body.id}'`, function (err, rows) { //dodatkowo ustawia triggerem status=0 w tdc
+        if (err) { res.json({ success: false, err: err }); return; }
+        res.json({ success: true, msg: 'CUSTOMER_UNLOCKED' });
+    });
+}
+
+
+const deleteCustomerOrder = function (req, res, next) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+        return;
+    }
+    console.log("DELETE CUSTOMER ORDER",req.body);
+
+    connection.query(`DELETE FROM customerorder WHERE customer_id='${req.body.customer_id}' AND delivery_date='${moment(req.body.day).format('YYYY-MM-DD HH:mm')}'`, function (err, rows) { //dodatkowo ustawia triggerem status=0 w tdc
+        if (err) { res.json({ success: false, err: err }); return; }
+        res.json({ success: true, msg: 'ORDER_DELETED' });
     });
 }
 
@@ -235,16 +286,13 @@ resetTrays(reset,cropID,harvest).then((reset)=>{
 
 
 const addCrops = function (req, res, next) {
-    console.log(req.body);
     const errors = validationResult(req);
     if (!errors.isEmpty()) { res.status(400).json({ errors: errors.array() }); return; }
     vals = `('${req.body.microgreenID}','${req.body.notes}')`;
     //wrzucanie rekordu crop bez walidacji zajętości półki
-    console.log("ADD CROPS")
-    console.log(vals);
     connection.query("INSERT INTO crops (microgreen_id,notes) VALUES" + vals, function (err, rows) {
         
-        if (err) { res.json({ success: false, err: err }); console.log(err);  return; }
+        if (err) { res.json({ success: false, err: err });  return; }
     connection.query(`SELECT * FROM crops WHERE id='${rows.insertId}'`, function (err, cropData) {
         res.json({ success: true, msg: 'CROP_ADDED',crop:cropData[0] });
     });
@@ -253,20 +301,15 @@ const addCrops = function (req, res, next) {
 }
 
 const addOrder = function (req, res, next) {
-    console.log(req.body);
     const errors = validationResult(req);
     if (!errors.isEmpty()) { res.status(400).json({ errors: errors.array() }); return; }
     valsOrder = `('${req.body.customerID}','${req.body.deliveryDate}','${req.body.notes}')`;
-    console.log("ADD ORDER")
-    //console.log(valsOrder);
     const orders=req.body.orders;
     connection.query("INSERT INTO customerorder (customer_id,delivery_date,notes) VALUES" + valsOrder, function (err, rows) {
         if (err) { res.json({ success: false, err: err }); console.log(err);  return; }
         const orderID=rows.insertId;
 
 const ordersMap=orders.map((x)=>`('${orderID}','${x.microgreensID}',${x.weight})`);
-console.log("MEEEE")
-        console.log(ordersMap);
         connection.query("INSERT INTO orders (order_id,microgreen_id,weight) VALUES" + ordersMap, function (err, rows) {
             if (err) { res.json({ success: false, err: err }); console.log(err);  return; }
             res.json({ success: true, msg: 'ORDER_ADDED'});
@@ -279,7 +322,6 @@ console.log("MEEEE")
 const addCustomer = function (req, res, next) {
     const dataArr = [];
     const errors = validationResult(req);
-   //console.log(req.body);
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
         return;
@@ -289,7 +331,6 @@ const addCustomer = function (req, res, next) {
         deliveryPostcode,deliveryLocation,deliveryVoivodeship,customerEmail,customerTelephone1,customerTelephone2] = dataArr;
     const vals = `(${companyName},${NIP},${REGON},${customerAddress},${customerPostcode},${customerLocation},${customerVoivodeship},${customerFullname},${PESEL},${deliveryAddress},
         ${deliveryPostcode},${deliveryLocation},${deliveryVoivodeship},${customerEmail},${customerTelephone1},${customerTelephone2})`;
-    console.log(vals);
     connection.query("INSERT INTO customers (company_name,company_nip,company_regon,customer_address,customer_postcode, customer_location,customer_voivodeship,customer_fullname,customer_pesel,delivery_address,delivery_postcode,delivery_location,delivery_voivodeship,customer_email,customer_telephone1,customer_telephone2) VALUES" + vals, function (err, rows) {
         if (err) { res.json({ success: false, err: err }); return; }
         res.json({ success: true, msg: 'CUSTOMER_ADDED' });
@@ -326,8 +367,6 @@ const addRacks = function (req, res, next) {
 
 const editMicrogreens = function (req, res) {
     const microgreens = req.body;
-    console.log("MICRO EDIT:")
-    console.log(microgreens);
     connection.query(`UPDATE microgreens SET name_en='${microgreens.name_en}',name_pl='${microgreens.name_pl}',grams_tray='${microgreens.grams_tray}'
     , grams_harvest='${microgreens.grams_harvest}',watering_level='${microgreens.watering_level}',weight='${microgreens.weight}',blackout='${microgreens.blackout}',light='${microgreens.light}',color='${microgreens.color}' WHERE id='${microgreens.id}'`, function (err, result) {
         if (err) { res.json({ success: false, msg: err }); return; }
@@ -338,8 +377,7 @@ const editMicrogreens = function (req, res) {
 
 const editOrder = function (req, res) {
     const order = req.body;
-    console.log("ORDER EDIT:")
-    console.log(order);
+
     connection.query(`UPDATE customerorder SET delivery_date='${order.delivery_date}', notes='${order.notes} WHERE id=${order.id}`, function (err, result) {
         if (err) { res.json({ success: false, msg: err }); return; }
 
@@ -375,7 +413,7 @@ const editCustomer = function (req, res) {
 
 const scheduleWatering = function (req, res) {
     const crop = req.body.crop;
-  //  console.log(crop);
+
     connection.query(`UPDATE crops SET scheduled='1' WHERE id='${crop}'`, function (err, result) {
         if (err) { res.json({ success: false, msg: err }); return; }
         res.json({ succes: true, msg: "CROP_SCHEDULED" });
@@ -392,4 +430,4 @@ const completeWatering = function (req, res) {
 }
 
 
-module.exports = { getCrops, getTrayDateCrops,getFNDTrays, getTrays, getMicrogreens, getShelves,getCustomers,getOrders, addMicrogreens, addRacks, addCrops,addOrder,addCustomer, editCrop,editOrder, deleteCrop, editMicrogreens,editCustomer, saveNotes, scheduleWatering, completeWatering, saveScheduleTDC };
+module.exports = { getCrops, getTrayDateCrops,getFNDTrays, getTrays, getMicrogreens, getShelves,getCustomers,getOrders, addMicrogreens, addRacks, addCrops,addOrder,addCustomer, editCrop,editOrder, deleteCustomerOrder,deleteCrop, deleteMicrogreens,lockCustomer,unlockCustomer,editMicrogreens,editCustomer, saveNotes, scheduleWatering, completeWatering, saveScheduleTDC };

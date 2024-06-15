@@ -231,12 +231,14 @@ app.post(
 );
 
 
-/*
-app.post('/deletecrop',[
-    body('crop_id').isInt().withMessage("Not integer!"),
-], db.deleteCrop);*/
 
 app.post("/deletecrop", db.deleteCrop);
+app.post("/deletemicrogreens", db.deleteMicrogreens);
+app.post("/lockcustomer", db.lockCustomer);
+app.post("/unlockcustomer", db.unlockCustomer);
+app.post("/deletecustomerorder", db.deleteCustomerOrder);
+
+
 
 app.post(
   "/savenotes",
