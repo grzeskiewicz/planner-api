@@ -412,11 +412,11 @@ const editCustomer = function (req, res) {
 }
 
 const scheduleWatering = function (req, res) {
-    const crop = req.body.crop;
-
-    connection.query(`UPDATE crops SET scheduled='1' WHERE id='${crop}'`, function (err, result) {
+    const crops = req.body.crops;
+console.log(crops);
+    connection.query(`UPDATE crops SET scheduled='1' WHERE id IN (${crops.join(",")})`, function (err, result) {
         if (err) { res.json({ success: false, msg: err }); return; }
-        res.json({ succes: true, msg: "CROP_SCHEDULED" });
+        res.json({ success: true, msg: "CROPS_SCHEDULED" });
     });
 }
 
@@ -425,7 +425,7 @@ const completeWatering = function (req, res) {
     const crop = req.body.crop;
     connection.query(`UPDATE crops SET completed='1' WHERE id='${crop}'`, function (err, result) {
         if (err) { res.json({ success: false, msg: err }); return; }
-        res.json({ succes: true, msg: "CROP_COMPLETED" });
+        res.json({ success: true, msg: "CROP_COMPLETED" });
     });
 }
 
