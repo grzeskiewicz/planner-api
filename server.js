@@ -61,6 +61,8 @@ app.post("/editorder", db.editOrder);
 
 app.post("/schedulewatering", db.scheduleWatering);
 app.post("/completewatering", db.completeWatering);
+app.post("/cleanschedule", db.cleanSchedule);
+
 
 const resetorangepi = function (req, res) {
   axios

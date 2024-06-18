@@ -36,15 +36,10 @@ function handleDisconnect() {
 handleDisconnect();
 
 
-
-
-
-//TODO: get microgreens, get crops, get shelves - done
-//TODO2: add microgreens, add racks!, add crops
-//TODO3: edit microgreens, delete racks, delete shelves,edit crops
+//TODO: add Rack
 
 const getCrops = function (req, res) {
-    connection.query(`SELECT * FROM crops`, function (err, rows) {
+    connection.query(`SELECT * FROM crops ORDER BY harvest`, function (err, rows) {
         if (err) { res.json(err); return; }
         res.json(rows);
     });
@@ -413,13 +408,20 @@ const editCustomer = function (req, res) {
 
 const scheduleWatering = function (req, res) {
     const crops = req.body.crops;
-console.log(crops);
     connection.query(`UPDATE crops SET scheduled='1' WHERE id IN (${crops.join(",")})`, function (err, result) {
         if (err) { res.json({ success: false, msg: err }); return; }
         res.json({ success: true, msg: "CROPS_SCHEDULED" });
     });
 }
 
+
+const cleanSchedule = function (req, res) {
+    const crops = req.body.crops;
+    connection.query(`UPDATE crops SET scheduled='0' WHERE id IN (${crops.join(",")})`, function (err, result) {
+        if (err) { res.json({ success: false, msg: err }); return; }
+        res.json({ success: true, msg: "SCHEDULE_CLEANED" });
+    });
+}
 
 const completeWatering = function (req, res) {
     const crop = req.body.crop;
@@ -430,4 +432,4 @@ const completeWatering = function (req, res) {
 }
 
 
-module.exports = { getCrops, getTrayDateCrops,getFNDTrays, getTrays, getMicrogreens, getShelves,getCustomers,getOrders, addMicrogreens, addRacks, addCrops,addOrder,addCustomer, editCrop,editOrder, deleteCustomerOrder,deleteCrop, deleteMicrogreens,lockCustomer,unlockCustomer,editMicrogreens,editCustomer, saveNotes, scheduleWatering, completeWatering, saveScheduleTDC };
+module.exports = { getCrops, getTrayDateCrops,getFNDTrays, getTrays, getMicrogreens, getShelves,getCustomers,getOrders, addMicrogreens, addRacks, addCrops,addOrder,addCustomer, editCrop,editOrder, deleteCustomerOrder,deleteCrop, deleteMicrogreens,lockCustomer,unlockCustomer,editMicrogreens,editCustomer, saveNotes, scheduleWatering,cleanSchedule, completeWatering, saveScheduleTDC };
