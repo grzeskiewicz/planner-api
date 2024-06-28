@@ -79,7 +79,7 @@ const getCustomers = function (req, res) {
 
 
 const getOrders = function (req, res) {
-    connection.query(`SELECT orders.id, orders.microgreen_id,orders.weight, customerorder.id, customerorder.customer_id, customerorder.delivery_date,customerorder.notes
+    connection.query(`SELECT orders.id AS id, orders.microgreen_id,orders.weight,orders.crop_id, order_id AS custuomerorder_id, customerorder.customer_id, customerorder.delivery_date,customerorder.notes
     FROM orders
     INNER JOIN customerorder ON orders.order_id = customerorder.id ORDER BY customerorder.delivery_date`, function (err, rows) {
         if (err) { res.json(err); return; }
@@ -388,8 +388,26 @@ const editCrop = function (req, res) {
     connection.query(`UPDATE crops SET harvest='${crop.harvest}',microgreen_id='${crop.microgreenID}',shelf_id='${crop.shelfID}'
     , trays='${crop.tray}',notes='${crop.notes}' WHERE id='${crop.id}'`, function (err, result) {
         if (err) { res.json({ success: false, msg: err }); return; }
-        res.json({ succes: true, msg: "CROP_EDITED" });
+        res.json({ success: true, msg: "CROP_EDITED" });
     });
+}
+
+
+const linkCrops = function (req, res) {
+    const cropsToLink = req.body.linkedOrderCrop;
+    //console.log(cropsToLink);
+    const test=cropsToLink.map((x)=> `when ${x.order} then ${x.crop===0? 'NULL':x.crop}`).join(" ");
+
+const ids=cropsToLink.map((x)=>`${x.order}`).join(",");
+//console.log(`(${ids})`);
+//console.log(test);
+
+connection.query(`UPDATE orders SET crop_id = CASE id ${test} end WHERE id IN (${ids})`, function (err, result) {
+        if (err) { res.json({ success: false, msg: err }); console.log(err); return; }
+        res.json({ success: true, msg: "CROPS_LINKED" });
+    });
+
+
 }
 
 const editCustomer = function (req, res) {
@@ -432,4 +450,4 @@ const completeWatering = function (req, res) {
 }
 
 
-module.exports = { getCrops, getTrayDateCrops,getFNDTrays, getTrays, getMicrogreens, getShelves,getCustomers,getOrders, addMicrogreens, addRacks, addCrops,addOrder,addCustomer, editCrop,editOrder, deleteCustomerOrder,deleteCrop, deleteMicrogreens,lockCustomer,unlockCustomer,editMicrogreens,editCustomer, saveNotes, scheduleWatering,cleanSchedule, completeWatering, saveScheduleTDC };
+module.exports = { getCrops, getTrayDateCrops,getFNDTrays, getTrays, getMicrogreens, getShelves,getCustomers,getOrders, addMicrogreens, addRacks, addCrops,addOrder,addCustomer, editCrop,editOrder,linkCrops, deleteCustomerOrder,deleteCrop, deleteMicrogreens,lockCustomer,unlockCustomer,editMicrogreens,editCustomer, saveNotes, scheduleWatering,cleanSchedule, completeWatering, saveScheduleTDC };

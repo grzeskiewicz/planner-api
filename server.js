@@ -58,6 +58,8 @@ app.post("/editmicrogreens", db.editMicrogreens);
 app.post("/editcustomer", db.editCustomer);
 app.post("/editorder", db.editOrder);
 
+app.post("/linkcrops", db.linkCrops)
+
 
 app.post("/schedulewatering", db.scheduleWatering);
 app.post("/completewatering", db.completeWatering);
