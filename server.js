@@ -8,7 +8,7 @@ const bodyParser = require("body-parser");
 const db = require("./db/database");
 const { body, validationResult } = require("express-validator");
 const net = require("net");
-const ORANGEPI_SOCKET = "192.168.2.10";
+const ORANGEPI_SOCKET = "192.168.1.10";
 //var corsOptions = {
 //    origin: '*'
 //};
