@@ -128,7 +128,7 @@ const turnSocketOFF=function(req,res){
   const port = Number(req.body.port);
   axios.get(`http://${ip}/cm?cmnd=Power%20off`)
   .then((response) => {
-    if (response.data.POWER === "ON") res.json({ success: true, msg: "POWER OFF" });
+    if (response.data.POWER === "OFF") res.json({ success: true, msg: "POWER OFF" });
 
 
   })
