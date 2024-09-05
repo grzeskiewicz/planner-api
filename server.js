@@ -9,6 +9,12 @@ const db = require("./db/database");
 const { body, validationResult } = require("express-validator");
 const net = require("net");
 const ORANGEPI_SOCKET = "192.168.1.10";
+
+app.use(function (req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*"); // "*"
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
 //var corsOptions = {
 //    origin: '*'
 //};
