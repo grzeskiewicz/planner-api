@@ -324,8 +324,8 @@ const addCustomer = function (req, res, next) {
     for (const key of Object.keys(req.body)) dataArr.push(`'${req.body[key]}'`);
     const [companyName,NIP,REGON,customerAddress,customerPostcode,customerLocation,customerVoivodeship,customerFullname,PESEL,deliveryAddress,
         deliveryPostcode,deliveryLocation,deliveryVoivodeship,customerEmail,customerTelephone1,customerTelephone2] = dataArr;
-    const vals = `(${companyName},${NIP},${REGON},${customerAddress},${customerPostcode},${customerLocation},${customerVoivodeship},${customerFullname},${PESEL},${deliveryAddress},
-        ${deliveryPostcode},${deliveryLocation},${deliveryVoivodeship},${customerEmail},${customerTelephone1},${customerTelephone2})`;
+    const vals = `(${companyName.toUpperCase()},${NIP},${REGON},${customerAddress.toUpperCase()},${customerPostcode.toUpperCase()},${customerLocation.toUpperCase()},${customerVoivodeship.toUpperCase()},${customerFullname.toUpperCase()},${PESEL},${deliveryAddress.toUpperCase()},
+        ${deliveryPostcode},${deliveryLocation.toUpperCase()},${deliveryVoivodeship.toUpperCase()},${customerEmail.toUpperCase()},${customerTelephone1},${customerTelephone2})`;
     connection.query("INSERT INTO customers (company_name,company_nip,company_regon,customer_address,customer_postcode, customer_location,customer_voivodeship,customer_fullname,customer_pesel,delivery_address,delivery_postcode,delivery_location,delivery_voivodeship,customer_email,customer_telephone1,customer_telephone2) VALUES" + vals, function (err, rows) {
         if (err) { res.json({ success: false, err: err }); return; }
         res.json({ success: true, msg: 'CUSTOMER_ADDED' });
@@ -414,11 +414,11 @@ const editCustomer = function (req, res) {
     const customer = req.body;
     console.log("CUSTOMER EDIT:")
     console.log(customer);
-    connection.query(`UPDATE customers SET company_name='${customer.company_name}',company_nip='${customer.company_nip}',company_regon='${customer.company_regon}',customer_address='${customer.customer_address}'
-    ,customer_postcode='${customer.customer_postcode}', customer_location='${customer.customer_location}',customer_voivodeship='${customer.customer_voivodeship}'
-    ,customer_fullname='${customer.customer_fullname}',customer_pesel='${customer.customer_pesel}'
-    ,delivery_address='${customer.delivery_address}',delivery_postcode='${customer.delivery_postcode}',delivery_location='${customer.delivery_location}',delivery_voivodeship='${customer.delivery_voivodeship}'
-    ,customer_email='${customer.customer_email}',customer_telephone1='${customer.customer_telephone1}',customer_telephone2='${customer.customer_telephone2}' WHERE id='${customer.id}'`, function (err, result) {
+    connection.query(`UPDATE customers SET company_name='${customer.company_name.toUpperCase()}',company_nip='${customer.company_nip}',company_regon='${customer.company_regon}',customer_address='${customer.customer_address.toUpperCase()}'
+    ,customer_postcode='${customer.customer_postcode}', customer_location='${customer.customer_location.toUpperCase()}',customer_voivodeship='${customer.customer_voivodeship.toUpperCase()}'
+    ,customer_fullname='${customer.customer_fullname.toUpperCase()}',customer_pesel='${customer.customer_pesel}'
+    ,delivery_address='${customer.delivery_address.toUpperCase()}',delivery_postcode='${customer.delivery_postcode}',delivery_location='${customer.delivery_location.toUpperCase()}',delivery_voivodeship='${customer.delivery_voivodeship.toUpperCase()}'
+    ,customer_email='${customer.customer_email.toUpperCase()}',customer_telephone1='${customer.customer_telephone1}',customer_telephone2='${customer.customer_telephone2}' WHERE id='${customer.id}'`, function (err, result) {
         if (err) { res.json({ success: false, msg: err }); return; }
         res.json({ success: true, msg: "CUSTOMER_EDITED" });
     });
