@@ -9,6 +9,7 @@ const db = require("./db/database");
 const { body, validationResult } = require("express-validator");
 const net = require("net");
 const ORANGEPI_SOCKET = "192.168.1.10";
+app.use(cors());
 
 app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*"); // "*"
@@ -22,7 +23,6 @@ app.use(function (req, res, next) {
 app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 app.use(bodyParser.json()); // support json encoded bodies
 app.options("*", cors()); // include before other routes
-app.use(cors());
 
 app.get("/", (req, res) => res.send("Welcome!"));
 

@@ -119,7 +119,7 @@ const addMicrogreens = function (req, res, next) { //TODO:walidacja pól
     }
     for (const key of Object.keys(req.body)) dataArr.push(`'${req.body[key]}'`);
     const [nameEN, namePL, gramsTray, gramsHarvest,wateringLevel, weight, blackout, light, color] = dataArr;
-    const vals = `(${nameEN},${namePL},${gramsTray},${gramsHarvest},${wateringLevel},${weight},${blackout},${light},${color})`;
+    const vals = `(${nameEN.toUpperCase()},${namePL.toUpperCase()},${gramsTray},${gramsHarvest},${wateringLevel},${weight},${blackout},${light},${color})`;
 
     connection.query("INSERT INTO microgreens (name_en,name_pl,grams_tray,grams_harvest,watering_level,weight,blackout,light,color) VALUES" + vals, function (err, rows) {
         if (err) { res.json({ success: false, err: err }); return; }
@@ -362,7 +362,7 @@ const addRacks = function (req, res, next) {
 
 const editMicrogreens = function (req, res) {
     const microgreens = req.body;
-    connection.query(`UPDATE microgreens SET name_en='${microgreens.name_en}',name_pl='${microgreens.name_pl}',grams_tray='${microgreens.grams_tray}'
+    connection.query(`UPDATE microgreens SET name_en='${(microgreens.name_en).toUpperCase()}',name_pl='${(microgreens.name_pl).toUpperCase()}',grams_tray='${microgreens.grams_tray}'
     , grams_harvest='${microgreens.grams_harvest}',watering_level='${microgreens.watering_level}',weight='${microgreens.weight}',blackout='${microgreens.blackout}',light='${microgreens.light}',color='${microgreens.color}' WHERE id='${microgreens.id}'`, function (err, result) {
         if (err) { res.json({ success: false, msg: err }); return; }
         res.json({ success: true, msg: "MICROGREENS_EDITED" });
