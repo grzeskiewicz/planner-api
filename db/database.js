@@ -450,4 +450,16 @@ const completeWatering = function (req, res) {
 }
 
 
-module.exports = { getCrops, getTrayDateCrops,getFNDTrays, getTrays, getMicrogreens, getShelves,getCustomers,getOrders, addMicrogreens, addRacks, addCrops,addOrder,addCustomer, editCrop,editOrder,linkCrops, deleteCustomerOrder,deleteCrop, deleteMicrogreens,lockCustomer,unlockCustomer,editMicrogreens,editCustomer, saveNotes, scheduleWatering,cleanSchedule, completeWatering, saveScheduleTDC };
+
+const addAquaponicsTemperature = function (temperature) {
+const connectionAquaponics= mysql.createConnection(dbConfig.configTempDB);
+connectionAquaponics.query = util.promisify(connection.query).bind(connectionAquaponics);
+
+    connectionAquaponics.query("INSERT INTO temperaturesdwc (temperature) VALUES" + `(${temperature})` , function (err, rows) {
+        if (err) {console.log(err); return; }
+        console.log("Zapisano pomiar do bazy.");
+    });
+}
+
+
+module.exports = { getCrops, getTrayDateCrops,getFNDTrays, getTrays, getMicrogreens, getShelves,getCustomers,getOrders, addMicrogreens, addRacks, addCrops,addOrder,addCustomer, editCrop,editOrder,linkCrops, deleteCustomerOrder,deleteCrop, deleteMicrogreens,lockCustomer,unlockCustomer,editMicrogreens,editCustomer, saveNotes, scheduleWatering,cleanSchedule, completeWatering, saveScheduleTDC, addAquaponicsTemperature };

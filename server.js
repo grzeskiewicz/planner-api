@@ -163,6 +163,43 @@ app.post("/turnon",turnSocketON);
 app.post("/turnoff",turnSocketOFF);
 app.post("/getsocketinfo",getSocketInfo);
 
+
+//MQTT SERVICE
+//====================================================================
+
+const mqtt = require('mqtt')
+const emqx_url = '192.168.1.3';  
+
+const options = {  
+    clean: true,  
+    username: 'benake',  
+    password: 'palkast1',  
+}
+
+const connectUrl = 'mqtt://' + emqx_url  
+const client = mqtt.connect(connectUrl, options)
+
+client.on('connect', () => {  
+    console.log('Connected to the broker.')  
+    client.subscribe('tele/tsm-watertemp/SENSOR', (err) => {  
+        if (!err) {  
+            console.log('Subscribed to topic')  
+        }  
+    })  
+})
+
+client.on('message', (topic, message) => {  
+  const sensor=JSON.parse(message);
+  const temperature=sensor.DS18B20.Temperature
+  console.log(temperature);
+  db.addAquaponicsTemperature(temperature); //temperature db save
+});
+
+
+
+//===========================================================================
+
+
 const ping = function (req, res) {
   const ip = String(req.body.ip);
   const port = Number(req.body.port);
@@ -293,7 +330,6 @@ app.get("/customers", db.getCustomers);
 app.get("/orders", db.getOrders);
 
 
-
 /*const port = process.env.PORT || 3001,
     ip = process.env.IP || '127.0.0.1';*/
 
@@ -301,5 +337,4 @@ app.listen("3001", () => {
   console.log("NODEJS RUNNING");
 });
 //http.listen(port);
-//console.log('Server running on http://%s:%s', ip,port);
 module.exports = app;
