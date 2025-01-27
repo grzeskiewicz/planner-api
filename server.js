@@ -329,6 +329,8 @@ app.get("/fndtrays", db.getFNDTrays);
 app.get("/customers", db.getCustomers);
 app.get("/orders", db.getOrders);
 
+app.get("/getsensorreadstoday", db.getSensorReadsToday);
+
 
 /*const port = process.env.PORT || 3001,
     ip = process.env.IP || '127.0.0.1';*/

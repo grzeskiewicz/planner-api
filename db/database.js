@@ -462,4 +462,14 @@ connectionAquaponics.query = util.promisify(connectionAquaponics.query).bind(con
 }
 
 
-module.exports = { getCrops, getTrayDateCrops,getFNDTrays, getTrays, getMicrogreens, getShelves,getCustomers,getOrders, addMicrogreens, addRacks, addCrops,addOrder,addCustomer, editCrop,editOrder,linkCrops, deleteCustomerOrder,deleteCrop, deleteMicrogreens,lockCustomer,unlockCustomer,editMicrogreens,editCustomer, saveNotes, scheduleWatering,cleanSchedule, completeWatering, saveScheduleTDC, addAquaponicsTemperature };
+const getSensorReadsToday = function(req,res){
+    const connectionAquaponics= mysql.createConnection(dbConfig.configTempDB);
+connectionAquaponics.query = util.promisify(connectionAquaponics.query).bind(connectionAquaponics);
+connectionAquaponics.query(`SELECT * FROM temperaturesdwc WHERE DATE(date) = CURDATE()`, function (err, rows) {
+        if (err) { res.json(err); return; }
+        res.json(rows);
+    });    
+}
+
+
+module.exports = { getCrops, getTrayDateCrops,getFNDTrays, getTrays, getMicrogreens, getShelves,getCustomers,getOrders, addMicrogreens, addRacks, addCrops,addOrder,addCustomer, editCrop,editOrder,linkCrops, deleteCustomerOrder,deleteCrop, deleteMicrogreens,lockCustomer,unlockCustomer,editMicrogreens,editCustomer, saveNotes, scheduleWatering,cleanSchedule, completeWatering, saveScheduleTDC, addAquaponicsTemperature,getSensorReadsToday };
