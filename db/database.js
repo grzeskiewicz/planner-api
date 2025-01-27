@@ -453,7 +453,7 @@ const completeWatering = function (req, res) {
 
 const addAquaponicsTemperature = function (temperature) {
 const connectionAquaponics= mysql.createConnection(dbConfig.configTempDB);
-connectionAquaponics.query = util.promisify(connection.query).bind(connectionAquaponics);
+connectionAquaponics.query = util.promisify(connectionAquaponics.query).bind(connectionAquaponics);
 
     connectionAquaponics.query("INSERT INTO temperaturesdwc (temperature) VALUES" + `(${temperature})` , function (err, rows) {
         if (err) {console.log(err); return; }
