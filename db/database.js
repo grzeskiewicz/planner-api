@@ -487,6 +487,7 @@ const addAquaponicsTemperature = function (temperature) {
         console.log("Zapisano pomiar do bazy.");
         connectionAquaponics.end();
     });
+    connectionAquaponics.end();
 }
 
 
@@ -495,7 +496,10 @@ connectionAquaponics.query(`SELECT * FROM temperaturesdwc WHERE DATE(date) = CUR
         if (err) { res.json(err); return; }
         connectionAquaponics.end();
         res.json(rows);
-    });    
+    });  
+    console.log("test")
+    connectionAquaponics.end();
+  
 }
 
 
