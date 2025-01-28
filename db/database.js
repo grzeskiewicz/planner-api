@@ -485,21 +485,15 @@ const addAquaponicsTemperature = function (temperature) {
     connectionAquaponics.query("INSERT INTO temperaturesdwc (temperature) VALUES" + `(${temperature})` , function (err, rows) {
         if (err) {console.log(err); return; }
         console.log("Zapisano pomiar do bazy.");
-        connectionAquaponics.end();
     });
-    connectionAquaponics.end();
 }
 
 
 const getSensorReadsToday = function(req,res){
 connectionAquaponics.query(`SELECT * FROM temperaturesdwc WHERE DATE(date) = CURDATE()`, function (err, rows) {
         if (err) { res.json(err); return; }
-        connectionAquaponics.end();
         res.json(rows);
-    });  
-    console.log("test")
-    connectionAquaponics.end();
-  
+    });    
 }
 
 
