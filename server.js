@@ -198,39 +198,46 @@ client.on('message', (topic, message) => {
 
 
 //===========================================================================
+//GOVEE TEMPERATURE/HUMIDITY TO DB SAVE EVERY 15 MINUTES
+//===========================================================================
+const GOVEE_API_URL='https://openapi.api.govee.com/router/api/v1/device/state';
+const headers = new Headers({
+    'Accept': 'application/json',
+    'Content-Type': 'application/json',
+    'Govee-API-Key': '46c95029-cff4-41ef-9692-f106c36cd178'
+});
 
-//GOVEE MQTT SERVICE
-//====================================================================
 
-const goveeURL =  'mqtt.openapi.govee.com';
-const apiKey = '46c95029-cff4-41ef-9692-f106c36cd178';
-
-const optionsGovee = {  
-    clean: true,  
-    username:  apiKey,  
-    password: apiKey
+function request(url) {
+    return new Request(url, {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify({
+          "requestId": "uuid",
+          "payload": {
+                  "sku": "H5179",
+                  "device": "EF:B4:17:29:DC:90:A0:ED"
+          }
+      })
+    });
 }
 
-const connectGoveeURL = 'mqtt://' + goveeURL  
-const clientGovee = mqtt.connect(connectGoveeURL, optionsGovee)
 
-clientGovee.on('connect', () => {  
-    console.log('Connected to the broker.');
-
-    clientGovee.subscribe(apiKey, (err) => {  
-        if (!err) {  
-            console.log('Subscribed to topic')  
-        }  
-    })  
+fetch(request(`${GOVEE_API_URL}`))
+.then((res) => res.json())
+.then((result) => {
+console.log(result);
 })
+.catch((error) => {alert("Problem z pobraniem danych z API GOVEE!"); return error});
 
-clientGovee.on('message', (topic, message) => {  
-  //const sensor=JSON.parse(message);
-  //const temperature=sensor.DS18B20.Temperature
-  console.log('Govee:');
-  console.log(message);
-  //db.addAquaponicsTemperature(temperature); //temperature db save
-});
+
+/*
+
+  setTimeout(() => {
+
+  }, "500");
+
+  */
 
 //===========================================================================
 

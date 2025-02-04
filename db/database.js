@@ -489,6 +489,14 @@ const addAquaponicsTemperature = function (temperature) {
 }
 
 
+const addGoveeTempHumidity = function (temperature,humidity) {
+    connectionAquaponics.query("INSERT INTO govee (temperature,humidity) VALUES" + `(${temperature})` + `(${humidity})` , function (err, rows) {
+        if (err) {console.log(err); return; }
+        console.log("Zapisano pomiar z Govee do bazy.");
+    });
+}
+
+
 const getSensorReadsToday = function(req,res){
 connectionAquaponics.query(`SELECT * FROM temperaturesdwc WHERE DATE(date) = CURDATE()`, function (err, rows) {
         if (err) { res.json(err); return; }
