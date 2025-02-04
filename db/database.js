@@ -505,4 +505,4 @@ connectionAquaponics.query(`SELECT * FROM temperaturesdwc WHERE DATE(date) = CUR
 }
 
 
-module.exports = { getCrops, getTrayDateCrops,getFNDTrays, getTrays, getMicrogreens, getShelves,getCustomers,getOrders, addMicrogreens, addRacks, addCrops,addOrder,addCustomer, editCrop,editOrder,linkCrops, deleteCustomerOrder,deleteCrop, deleteMicrogreens,lockCustomer,unlockCustomer,editMicrogreens,editCustomer, saveNotes, scheduleWatering,cleanSchedule, completeWatering, saveScheduleTDC, addAquaponicsTemperature,getSensorReadsToday };
+module.exports = { getCrops, getTrayDateCrops,getFNDTrays, getTrays, getMicrogreens, getShelves,getCustomers,getOrders, addMicrogreens, addRacks, addCrops,addOrder,addCustomer, editCrop,editOrder,linkCrops, deleteCustomerOrder,deleteCrop, deleteMicrogreens,lockCustomer,unlockCustomer,editMicrogreens,editCustomer, saveNotes, scheduleWatering,cleanSchedule, completeWatering, saveScheduleTDC, addAquaponicsTemperature,getSensorReadsToday,addGoveeTempHumidity };

@@ -226,7 +226,11 @@ function request(url) {
 fetch(request(`${GOVEE_API_URL}`))
 .then((res) => res.json())
 .then((result) => {
-console.log(result);
+const stateArray=result.payload.capabilities;
+const temperature=stateArray.filter((x)=>x.instance==="sensorTemperature");
+const humidity=stateArray.filter((x)=>x.instance==="sensorHumidity");
+console.log("GOVEE: ",temperature,humidity);
+
 })
 .catch((error) => {alert("Problem z pobraniem danych z API GOVEE!"); return error});
 
