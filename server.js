@@ -236,7 +236,7 @@ db.addGoveeTempHumidity((temperature - 32) * 5/9,humidity); ;
 .catch((error) => {console.log("Problem z pobraniem danych z API GOVEE!"); return error});
 }
 
-setInterval(readGovee,60000);
+setInterval(readGovee,900000);
 
 
 //===========================================================================
