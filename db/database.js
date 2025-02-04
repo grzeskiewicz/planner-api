@@ -490,7 +490,7 @@ const addAquaponicsTemperature = function (temperature) {
 
 
 const addGoveeTempHumidity = function (temperature,humidity) {
-    connectionAquaponics.query("INSERT INTO govee (temperature,humidity) VALUES" + `(${temperature})` + `(${humidity})` , function (err, rows) {
+    connectionAquaponics.query("INSERT INTO govee (temperature,humidity) VALUES" + `(${temperature},${humidity})` , function (err, rows) {
         if (err) {console.log(err); return; }
         console.log("Zapisano pomiar z Govee do bazy.");
     });
