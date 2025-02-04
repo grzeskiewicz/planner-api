@@ -222,26 +222,22 @@ function request(url) {
     });
 }
 
-
+function readGovee(){
 fetch(request(`${GOVEE_API_URL}`))
 .then((res) => res.json())
 .then((result) => {
 const stateArray=result.payload.capabilities;
-const temperature=stateArray.filter((x)=>x.instance==="sensorTemperature");
-const humidity=stateArray.filter((x)=>x.instance==="sensorHumidity");
-console.log("GOVEE: ",temperature,humidity);
-
+const temperatureArr=stateArray.filter((x)=>x.instance==="sensorTemperature");
+const humidityArr=stateArray.filter((x)=>x.instance==="sensorHumidity");
+const temperature=temperatureArr[0].state.value
+const humidity=humidityArr[0].state.value.currentHumidity;
+db.addGoveeTempHumidity(temperature,humidity);
 })
-.catch((error) => {alert("Problem z pobraniem danych z API GOVEE!"); return error});
+.catch((error) => {console.log("Problem z pobraniem danych z API GOVEE!"); return error});
+}
 
+setInterval(readGovee,60000);
 
-/*
-
-  setTimeout(() => {
-
-  }, "500");
-
-  */
 
 //===========================================================================
 
