@@ -199,6 +199,43 @@ client.on('message', (topic, message) => {
 
 //===========================================================================
 
+//GOVEE MQTT SERVICE
+//====================================================================
+
+const goveeURL =  'mqtt.openapi.govee.com';
+const apiKey = '46c95029-cff4-41ef-9692-f106c36cd178';
+
+const optionsGovee = {  
+    clean: true,  
+    username:  apiKey,  
+    password: apiKey
+}
+
+const connectGoveeURL = 'mqtt://' + goveeURL  
+const clientGovee = mqtt.connect(connectGoveeURL, optionsGovee)
+
+clientGovee.on('connect', () => {  
+    console.log('Connected to the broker.');
+
+    clientGovee.subscribe(apiKey, (err) => {  
+        if (!err) {  
+            console.log('Subscribed to topic')  
+        }  
+    })  
+})
+
+clientGovee.on('message', (topic, message) => {  
+  //const sensor=JSON.parse(message);
+  //const temperature=sensor.DS18B20.Temperature
+  console.log('Govee:');
+  console.log(message);
+  //db.addAquaponicsTemperature(temperature); //temperature db save
+});
+
+//===========================================================================
+
+
+
 
 const ping = function (req, res) {
   const ip = String(req.body.ip);
