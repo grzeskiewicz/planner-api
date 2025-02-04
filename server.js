@@ -374,6 +374,7 @@ app.get("/customers", db.getCustomers);
 app.get("/orders", db.getOrders);
 
 app.get("/getsensorreadstoday", db.getSensorReadsToday);
+app.get("/getgoveereadstoday", db.getGoveeReadsToday);
 
 
 /*const port = process.env.PORT || 3001,
