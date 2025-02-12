@@ -229,9 +229,12 @@ fetch(request(`${GOVEE_API_URL}`))
 const stateArray=result.payload.capabilities;
 const temperatureArr=stateArray.filter((x)=>x.instance==="sensorTemperature");
 const humidityArr=stateArray.filter((x)=>x.instance==="sensorHumidity");
-const temperature=temperatureArr[0].state.value; //farenheit
+const temperatureFarenheit=temperatureArr[0].state.value; //farenheit
+const temperature=((temperatureFarenheit - 32) * 5/9).toFixed(1);
 const humidity=humidityArr[0].state.value.currentHumidity;
-db.addGoveeTempHumidity((temperature - 32) * 5/9,humidity); ;
+console.log("ADD GOVEE");
+console.log(temperature,humidityArr[0]);
+db.addGoveeTempHumidity(temperature,humidity); ;
 })
 .catch((error) => {console.log("Problem z pobraniem danych z API GOVEE!"); return error});
 }
