@@ -43,13 +43,13 @@ app.post(
     body("gramsHarvest").isInt().withMessage("Not integer!"),
     body("wateringLevel").isInt().withMessage("Not integer!"),
     body("weight")
-      .isInt({ max: 15 })
+      .isInt({ max: 20 })
       .withMessage("Not integer or too high value!"),
     body("blackout")
-      .isInt({ max: 15 })
+      .isInt({ max: 20 })
       .withMessage("Not integer or too high value!"),
     body("light")
-      .isInt({ max: 15 })
+      .isInt()
       .withMessage("Not integer or too high value!"),
     body("color")
       .isString()
